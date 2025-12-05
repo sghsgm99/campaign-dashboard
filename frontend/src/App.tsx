@@ -12,9 +12,9 @@ const GoogleAdsDashboard = () => {
   const [campaigns, setCampaigns] = useState([]);
 
   const [formData, setFormData] = useState({
-    campaignName: 'campaignExam',
+    campaignName: '',
     campaignType: 'SEARCH',
-    dailyBudget: '2',
+    dailyBudget: '',
     targetLocation: '',
     keywords: '',
     adHeadline1: '',
@@ -22,7 +22,7 @@ const GoogleAdsDashboard = () => {
     adHeadline3: '',
     adDescription1: '',
     adDescription2: '',
-    finalUrl: 'https://www.test.com',
+    finalUrl: '',
     biddingStrategy: 'MAXIMIZE_CLICKS'
   });
 
