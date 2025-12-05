@@ -211,18 +211,41 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
       adGroupResource = adGroupResponse.mutate_operation_responses?.[0]?.ad_group_result?.resource_name!;
     }
 
+    // ---------------------------
+    // ✅ Create Keywords
+    // ---------------------------
+    let keywordResources: string[] = [];
+
+    if (adGroupResource && Array.isArray(keywords) && keywords.length > 0) {
+      const keywordOperations: MutateOperation<resources.IAdGroupCriterion>[] =
+        keywords.map((kw: string) => ({
+          entity: "ad_group_criterion",
+          operation: "create",
+          resource: {
+            ad_group: adGroupResource,
+            status: enums.AdGroupCriterionStatus.ENABLED,
+            keyword: {
+              text: kw,
+              match_type: enums.KeywordMatchType.BROAD, // default match type
+            },
+          },
+        }));
+
+      const keywordResponse = await customer.mutateResources(keywordOperations);
+
+      keywordResources =
+        keywordResponse.mutate_operation_responses?.map(
+          (k: any) => k.ad_group_criterion_result?.resource_name
+        ) || [];
+    }
+
     return res.status(201).json({
-      message: "Campaign and Ad Group created successfully",
-      budget: {
-        resource_name: campaignBudgetResource,
-      },
-      campaign: {
-        resource_name: campaignResource,
-      },
-      ad_group: {
-        resource_name: adGroupResource,
-      },
-      raw: response, // optional debugging
+      message: "Campaign, Ad Group & Keywords created successfully",
+      budget: { resource_name: campaignBudgetResource },
+      campaign: { resource_name: campaignResource },
+      ad_group: { resource_name: adGroupResource },
+      keywords: keywordResources,
+      raw: response, // optional debug
     });
 
   } catch (error: any) {
