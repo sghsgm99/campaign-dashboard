@@ -123,9 +123,9 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
       type,
       budget,
       location,
-      keywords,
-      headlines,
-      descriptions,
+      keywords = [],
+      headlines = [],
+      descriptions = [],
       finalUrl,
       biddingStrategy,
     } = req.body;
@@ -133,8 +133,8 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
     // Validation
     if (!name || !budget) {
       return res.status(400).json({
-        error: 'Missing required fields',
-        required: ['name', 'budget'],
+        error: "Missing required fields",
+        required: ["name", "budget"],
       });
     }
 
@@ -146,6 +146,9 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
       "-1"
     );
 
+    // -----------------------------
+    // 1️⃣ Create Campaign + Budget
+    // -----------------------------
     const operations: MutateOperation<
       resources.ICampaignBudget | resources.ICampaign
     >[] = [
@@ -163,7 +166,7 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
         entity: "campaign",
         operation: "create",
         resource: {
-          name: name,
+          name,
           advertising_channel_type: enums.AdvertisingChannelType.SEARCH,
           status: enums.CampaignStatus.PAUSED,
           manual_cpc: { enhanced_cpc_enabled: false },
@@ -173,51 +176,55 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
             target_search_network: true,
           },
           contains_eu_political_advertising:
-            enums.EuPoliticalAdvertisingStatus
-              .DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING,
+            enums.EuPoliticalAdvertisingStatus.DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING,
         },
       },
     ];
 
-    const response = await customer.mutateResources(operations);
+    const campaignResult = await customer.mutateResources(operations);
 
-    // Access the responses in the same index order
-    const budgetResponse = response.mutate_operation_responses?.[0];
-    const campaignResponse = response.mutate_operation_responses?.[1];
+    const campaignResource =
+      campaignResult.mutate_operation_responses?.[1]?.campaign_result
+        ?.resource_name;
 
-    // Extract resource names safely
-    const campaignBudgetResource = budgetResponse?.campaign_budget_result?.resource_name;
-    const campaignResource = campaignResponse?.campaign_result?.resource_name;
-
-    // Create Ad Group if campaign creation succeeded
-    let adGroupResource: string | undefined;
-
-    if (campaignResource) {
-      const adGroupOperations: MutateOperation<resources.IAdGroup>[] = [
-        {
-          entity: "ad_group",
-          operation: "create",
-          resource: {
-            name: `${name} - AdGroup`,
-            campaign: campaignResource,
-            status: enums.AdGroupStatus.ENABLED,
-            type: enums.AdGroupType.SEARCH_STANDARD,
-            cpc_bid_micros: toMicros(budget / 2), // example default bid
-          },
-        },
-      ];
-
-      const adGroupResponse = await customer.mutateResources(adGroupOperations);
-      adGroupResource = adGroupResponse.mutate_operation_responses?.[0]?.ad_group_result?.resource_name!;
+    if (!campaignResource) {
+      throw new Error("Failed to create campaign.");
     }
 
-    // ---------------------------
-    // ✅ Create Keywords
-    // ---------------------------
+    // -----------------------------
+    // 2️⃣ Create Ad Group
+    // -----------------------------
+    const adGroupOperations: MutateOperation<resources.IAdGroup>[] = [
+      {
+        entity: "ad_group",
+        operation: "create",
+        resource: {
+          name: `${name} - AdGroup`,
+          campaign: campaignResource,
+          status: enums.AdGroupStatus.ENABLED,
+          type: enums.AdGroupType.SEARCH_STANDARD,
+          cpc_bid_micros: toMicros(budget / 2),
+        },
+      },
+    ];
+
+    const adGroupResult = await customer.mutateResources(adGroupOperations);
+
+    const adGroupResource =
+      adGroupResult.mutate_operation_responses?.[0]?.ad_group_result
+        ?.resource_name;
+
+    if (!adGroupResource) {
+      throw new Error("Failed to create ad group.");
+    }
+
+    // -----------------------------
+    // 3️⃣ Create Keywords
+    // -----------------------------
     let keywordResources: string[] = [];
 
-    if (adGroupResource && Array.isArray(keywords) && keywords.length > 0) {
-      const keywordOperations: MutateOperation<resources.IAdGroupCriterion>[] =
+    if (keywords.length > 0) {
+      const keywordOps: MutateOperation<resources.IAdGroupCriterion>[] =
         keywords.map((kw: string) => ({
           entity: "ad_group_criterion",
           operation: "create",
@@ -226,28 +233,60 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
             status: enums.AdGroupCriterionStatus.ENABLED,
             keyword: {
               text: kw,
-              match_type: enums.KeywordMatchType.BROAD, // default match type
+              match_type: enums.KeywordMatchType.BROAD,
             },
           },
         }));
 
-      const keywordResponse = await customer.mutateResources(keywordOperations);
+      const keywordResult = await customer.mutateResources(keywordOps);
 
       keywordResources =
-        keywordResponse.mutate_operation_responses?.map(
+        keywordResult.mutate_operation_responses?.map(
           (k: any) => k.ad_group_criterion_result?.resource_name
         ) || [];
     }
 
-    return res.status(201).json({
-      message: "Campaign, Ad Group & Keywords created successfully",
-      budget: { resource_name: campaignBudgetResource },
-      campaign: { resource_name: campaignResource },
-      ad_group: { resource_name: adGroupResource },
-      keywords: keywordResources,
-      raw: response, // optional debug
-    });
+    // -----------------------------
+    // 4️⃣ Create ONE Responsive Search Ad (RSA)
+    // -----------------------------
+    let rsaResource: string | undefined;
 
+    if (finalUrl && headlines.length > 0 && descriptions.length > 0) {
+      const rsaOperations: MutateOperation<resources.IAdGroupAd>[] = [
+        {
+          entity: "ad_group_ad",
+          operation: "create",
+          resource: {
+            ad_group: adGroupResource,
+            status: enums.AdGroupAdStatus.PAUSED,
+            ad: {
+              final_urls: [finalUrl],
+              responsive_search_ad: {
+                headlines: headlines.map((h: string) => ({ text: h })),
+                descriptions: descriptions.map((d: string) => ({ text: d })),
+              },
+            },
+          },
+        },
+      ];
+
+      const rsaResult = await customer.mutateResources(rsaOperations);
+
+      rsaResource =
+        rsaResult.mutate_operation_responses?.[0]?.ad_group_ad_result
+          ?.resource_name!;
+    }
+
+    // -----------------------------
+    // RESPONSE
+    // -----------------------------
+    return res.status(201).json({
+      message: "Campaign, Ad Group, Keywords, and RSA created successfully",
+      campaign: campaignResource,
+      ad_group: adGroupResource,
+      keywords: keywordResources,
+      rsa: rsaResource,
+    });
   } catch (error: any) {
     console.dir(error, { depth: 20 });
 
@@ -258,6 +297,7 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
     });
   }
 });
+
 
 const createBudget = async (customer: Customer): Promise<string> => {
   const budgetResponse = await customer.campaignBudgets.create([
