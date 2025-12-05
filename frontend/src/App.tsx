@@ -308,8 +308,8 @@ const GoogleAdsDashboard = () => {
                       className="w-full px-4 py-2 border rounded-lg"
                     >
                       <option value="SEARCH">Search</option>
-                      <option value="DISPLAY">Display</option>
-                      <option value="VIDEO">Video</option>
+                      <option value="DISPLAY" disabled>Display</option>
+                      <option value="VIDEO" disabled>Video</option>
                     </select>
 
                     <input

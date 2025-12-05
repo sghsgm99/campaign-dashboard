@@ -71,7 +71,7 @@ app.get('/api/campaigns', async (req: Request, res: Response) => {
     const formattedCampaigns = campaigns.map((campaign: any) => ({
       id: campaign.campaign.id,
       name: campaign.campaign.name,
-      status: campaign.campaign.status,
+      status: enums.CampaignStatus[campaign.campaign.status] || 'UNKNOWN',
       budget: campaign.campaign_budget?.amount_micros 
         ? campaign.campaign_budget.amount_micros / 1000000 
         : 0,
