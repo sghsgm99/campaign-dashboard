@@ -188,13 +188,38 @@ app.post('/api/campaigns', async (req: Request, res: Response) => {
     const campaignBudgetResource = budgetResponse?.campaign_budget_result?.resource_name;
     const campaignResource = campaignResponse?.campaign_result?.resource_name;
 
+    // Create Ad Group if campaign creation succeeded
+    let adGroupResource: string | undefined;
+
+    if (campaignResource) {
+      const adGroupOperations: MutateOperation<resources.IAdGroup>[] = [
+        {
+          entity: "ad_group",
+          operation: "create",
+          resource: {
+            name: `${name} - AdGroup`,
+            campaign: campaignResource,
+            status: enums.AdGroupStatus.ENABLED,
+            type: enums.AdGroupType.SEARCH_STANDARD,
+            cpc_bid_micros: toMicros(budget / 2), // example default bid
+          },
+        },
+      ];
+
+      const adGroupResponse = await customer.mutateResources(adGroupOperations);
+      adGroupResource = adGroupResponse.mutate_operation_responses?.[0]?.ad_group_result?.resource_name!;
+    }
+
     return res.status(201).json({
-      message: "Campaign created successfully",
+      message: "Campaign and Ad Group created successfully",
       budget: {
         resource_name: campaignBudgetResource,
       },
       campaign: {
         resource_name: campaignResource,
+      },
+      ad_group: {
+        resource_name: adGroupResource,
       },
       raw: response, // optional debugging
     });
