@@ -20,13 +20,13 @@ const GoogleAdsDashboard = () => {
     campaignType: 'SEARCH',
     dailyBudget: '2',
     targetLocation: '',
-    keywords: 'dog',
-    adHeadline1: 'head1',
-    adHeadline2: 'head2',
-    adHeadline3: 'head3',
-    adDescription1: 'desc1',
-    adDescription2: 'blah',
-    finalUrl: 'https://www.google.com',
+    keywords: '',
+    adHeadline1: '',
+    adHeadline2: '',
+    adHeadline3: '',
+    adDescription1: '',
+    adDescription2: '',
+    finalUrl: 'https://www.test.com',
     biddingStrategy: 'MAXIMIZE_CLICKS'
   });
 
