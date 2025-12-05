@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Plus, Search, TrendingUp, DollarSign, Eye, MousePointer,
-  AlertCircle, CheckCircle2
+  Plus, 
+  Search,
+  AlertCircle, 
+  CheckCircle2
 } from 'lucide-react';
 import { api } from './services/api';
 
@@ -16,7 +18,7 @@ const GoogleAdsDashboard = () => {
   const [campaigns, setCampaigns] = useState([]);
 
   const [formData, setFormData] = useState({
-    campaignName: 'cam1',
+    campaignName: 'campaignExam',
     campaignType: 'SEARCH',
     dailyBudget: '2',
     targetLocation: '',
@@ -55,9 +57,6 @@ const GoogleAdsDashboard = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // -----------------------------------------
-  // UPDATED — calls backend API to create
-  // -----------------------------------------
   const handleCreateCampaign = async () => {
     if (!formData.campaignName || !formData.dailyBudget || !formData.finalUrl) {
       setCreationStatus({ type: 'error', message: 'Please fill in all required fields' });
