@@ -64,7 +64,8 @@ app.get('/api/campaigns', async (req: Request, res: Response) => {
         metrics.cost_micros
       FROM campaign
       WHERE campaign.status != 'REMOVED'
-      ORDER BY campaign.name
+      ORDER BY campaign.id DESC
+      LIMIT 10
     `);
 
     const formattedCampaigns = campaigns.map((campaign: any) => ({
