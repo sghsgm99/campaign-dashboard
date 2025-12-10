@@ -187,10 +187,10 @@ export class GoogleAdsService {
   async createAdGroups(adGroups: any[]) {
     try {
       const customerId = this.customer.credentials.customer_id;
-
-      // ------------------------------
-      // 1. Build AdGroup Mutation Ops
-      // ------------------------------
+  
+      //----------------------------------------------------
+      // 1. Build Ad Group Mutation Operations
+      //----------------------------------------------------
       const adGroupOperations: MutateOperation<resources.IAdGroup>[] = adGroups.map((g: any) => {
         const campaignResource = `customers/${customerId}/campaigns/${g.campaignId}`;
   
@@ -207,33 +207,33 @@ export class GoogleAdsService {
         };
       });
   
-      // ---------------------------------------
-      // 2. CREATE ALL AD GROUPS IN ONE MUTATION
-      // ---------------------------------------
+      //----------------------------------------------------
+      // 2. EXECUTE AD GROUP CREATION
+      //----------------------------------------------------
       const adGroupResult = await this.customer.mutateResources(adGroupOperations);
   
       if (!adGroupResult.mutate_operation_responses?.length) {
         throw new Error("Failed to create ad groups.");
       }
   
-      // Extract all newly created ad group resource names
       const createdAdGroupResources = adGroupResult.mutate_operation_responses
-        .map((res: any) => res?.ad_group_result?.resource_name)
+        .map((r: any) => r?.ad_group_result?.resource_name)
         .filter(Boolean);
   
       if (createdAdGroupResources.length !== adGroups.length) {
-        throw new Error("Mismatch: some ad groups were not created.");
+        throw new Error("Mismatch: Some ad groups were not created.");
       }
   
-      // ------------------------------
-      // 3. Build Keyword Ops (Bulk)
-      // ------------------------------
+      //----------------------------------------------------
+      // 3. Build Keyword Operations For ALL Ad Groups
+      //----------------------------------------------------
       const keywordOperations: MutateOperation<resources.IAdGroupCriterion>[] = [];
   
       createdAdGroupResources.forEach((adGroupResource: string, index: number) => {
         const group = adGroups[index];
   
-        group.keywords.forEach((kw: string) => {
+        // Add Broad match keywords
+        group.keywords.broad.forEach((kw: string) => {
           keywordOperations.push({
             entity: "ad_group_criterion",
             operation: "create",
@@ -247,11 +247,43 @@ export class GoogleAdsService {
             },
           });
         });
+  
+        // Add Phrase match keywords
+        group.keywords.phrase.forEach((kw: string) => {
+          keywordOperations.push({
+            entity: "ad_group_criterion",
+            operation: "create",
+            resource: {
+              ad_group: adGroupResource,
+              status: enums.AdGroupCriterionStatus.ENABLED,
+              keyword: {
+                text: kw,
+                match_type: enums.KeywordMatchType.PHRASE,
+              },
+            },
+          });
+        });
+  
+        // Add Exact match keywords
+        group.keywords.exact.forEach((kw: string) => {
+          keywordOperations.push({
+            entity: "ad_group_criterion",
+            operation: "create",
+            resource: {
+              ad_group: adGroupResource,
+              status: enums.AdGroupCriterionStatus.ENABLED,
+              keyword: {
+                text: kw,
+                match_type: enums.KeywordMatchType.EXACT,
+              },
+            },
+          });
+        });
       });
   
-      // ----------------------------------------
-      // 4. CREATE ALL KEYWORDS IN ONE MUTATION
-      // ----------------------------------------
+      //----------------------------------------------------
+      // 4. EXECUTE KEYWORD CREATION IN ONE BULK CALL
+      //----------------------------------------------------
       if (keywordOperations.length > 0) {
         const kwResult = await this.customer.mutateResources(keywordOperations);
   
@@ -260,16 +292,20 @@ export class GoogleAdsService {
         }
       }
   
+      //----------------------------------------------------
+      // SUCCESS RESULT
+      //----------------------------------------------------
       return {
-        message: "Ad groups and keywords created",
+        message: "Ad groups and keywords created successfully",
         adGroups: createdAdGroupResources,
       };
+  
     } catch (err: any) {
       console.error("Bulk AdGroup Creation Error:", err);
       throw new Error(err.message || "Failed to create ad groups");
     }
-  }
-  
+  }  
+
   async createAds(ads: any[]) {
     try {
       const customerId = this.customer.credentials.customer_id;
