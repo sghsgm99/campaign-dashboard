@@ -82,7 +82,7 @@ const CreateAdTab = ({ creationStatus, isCreating, handleCreateAd }: CreateAdTab
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Multiple Ads</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Multiple RSAs</h2>
 
         {creationStatus && (
           <div
