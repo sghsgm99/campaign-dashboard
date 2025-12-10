@@ -5,6 +5,7 @@ import TabNavigation from './components/TabNavigation';
 import OverviewTab from './components/OverviewTab';
 import CampaignsTab from './components/CampaignsTab';
 import CreateCampaignTab from './components/CreateCampaignTab';
+import CreateAdgroupTab from './components/CreateAdgroupTab';
 
 type CreationStatus = {
   type: 'success' | 'error';
@@ -12,7 +13,7 @@ type CreationStatus = {
 };
 
 const GoogleAdsDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'campaigns' | 'create campaign'>('create campaign');
+  const [activeTab, setActiveTab] = useState<'overview' | 'campaigns' | 'create_campaign' | 'create_adgroup'>('create_campaign');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     campaignName: '',
@@ -106,12 +107,39 @@ const GoogleAdsDashboard = () => {
       console.error('API Error:', error);
       setCreationStatus({
         type: 'error',
-        message: error?.response?.data?.message || 'Failed to create campaign',
+        message: error?.response?.data?.message || 'Failed to create_campaign',
       });
     }
 
     setIsCreating(false);
   };
+
+  const handleCreateAdgroup = async (adGroupsPayload: any[]) => {
+    setIsCreating(true);
+    setCreationStatus(null);
+  
+    try {
+      await api.createAdgroup({ adGroups: adGroupsPayload });
+  
+      setCreationStatus({ type: "success", message: "Ad groups created successfully!" });
+  
+      await loadCampaigns();
+  
+      setTimeout(() => {
+        setActiveTab("campaigns");
+        setCreationStatus(null);
+      }, 1500);
+    } catch (error: any) {
+      console.error("API Error:", error);
+      setCreationStatus({
+        type: "error",
+        message: error?.response?.data?.message || "Failed to create ad groups",
+      });
+    }
+  
+    setIsCreating(false);
+  };
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -122,7 +150,7 @@ const GoogleAdsDashboard = () => {
             <p className="text-sm text-gray-600 mt-1">Create and manage your advertising campaigns</p>
           </div>
           <button
-            onClick={() => setActiveTab('create campaign')}
+            onClick={() => setActiveTab('create_campaign')}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
             <Plus size={20} />
@@ -136,13 +164,20 @@ const GoogleAdsDashboard = () => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {activeTab === 'overview' && <OverviewTab campaigns={campaigns} />}
         {activeTab === 'campaigns' && <CampaignsTab campaigns={campaigns} />}
-        {activeTab === 'create campaign' && (
+        {activeTab === 'create_campaign' && (
           <CreateCampaignTab
             formData={formData}
             creationStatus={creationStatus}
             isCreating={isCreating}
             handleInputChange={handleInputChange}
             handleCreateCampaign={handleCreateCampaign}
+          />
+        )}
+        {activeTab === 'create_adgroup' && (
+          <CreateAdgroupTab
+            creationStatus={creationStatus}
+            isCreating={isCreating}
+            handleCreateAdgroup={handleCreateAdgroup}
           />
         )}
       </div>

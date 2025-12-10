@@ -22,4 +22,9 @@ export const api = {
     const response = await axios.delete(`${API_BASE_URL}/campaigns/${id}`);
     return response.data;
   },
+
+  createAdgroup: async (adgroupData: any) => {
+    const response = await axios.post(`${API_BASE_URL}/adgroups`, adgroupData);
+    return response.data;
+  },
 };

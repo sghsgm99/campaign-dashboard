@@ -183,4 +183,90 @@ export class GoogleAdsService {
       adGroup: adGroupResource,
     };
   }
+
+  async createAdGroups(adGroups: any[]) {
+    try {
+      // ------------------------------
+      // 1. Build AdGroup Mutation Ops
+      // ------------------------------
+      const adGroupOperations: MutateOperation<resources.IAdGroup>[] = adGroups.map((g: any) => {
+        const campaignResource = `customers/${this.customer.credentials.customer_id}/campaigns/${g.campaignId}`;
+  
+        return {
+          entity: "ad_group",
+          operation: "create",
+          resource: {
+            name: g.name,
+            campaign: campaignResource,
+            status: enums.AdGroupStatus.ENABLED,
+            type: enums.AdGroupType.SEARCH_STANDARD,
+            cpc_bid_micros: Math.round(g.defaultBid * 1_000_000),
+          },
+        };
+      });
+  
+      // ---------------------------------------
+      // 2. CREATE ALL AD GROUPS IN ONE MUTATION
+      // ---------------------------------------
+      const adGroupResult = await this.customer.mutateResources(adGroupOperations);
+  
+      if (!adGroupResult.mutate_operation_responses?.length) {
+        throw new Error("Failed to create ad groups.");
+      }
+  
+      // Extract all newly created ad group resource names
+      const createdAdGroupResources = adGroupResult.mutate_operation_responses
+        .map((res: any) => res?.ad_group_result?.resource_name)
+        .filter(Boolean);
+  
+      if (createdAdGroupResources.length !== adGroups.length) {
+        throw new Error("Mismatch: some ad groups were not created.");
+      }
+  
+      // ------------------------------
+      // 3. Build Keyword Ops (Bulk)
+      // ------------------------------
+      const keywordOperations: MutateOperation<resources.IAdGroupCriterion>[] = [];
+  
+      createdAdGroupResources.forEach((adGroupResource: string, index: number) => {
+        const group = adGroups[index];
+  
+        group.keywords.forEach((kw: string) => {
+          keywordOperations.push({
+            entity: "ad_group_criterion",
+            operation: "create",
+            resource: {
+              ad_group: adGroupResource,
+              status: enums.AdGroupCriterionStatus.ENABLED,
+              keyword: {
+                text: kw,
+                match_type: enums.KeywordMatchType.BROAD,
+              },
+            },
+          });
+        });
+      });
+  
+      // ----------------------------------------
+      // 4. CREATE ALL KEYWORDS IN ONE MUTATION
+      // ----------------------------------------
+      if (keywordOperations.length > 0) {
+        const kwResult = await this.customer.mutateResources(keywordOperations);
+  
+        if (!kwResult.mutate_operation_responses?.length) {
+          throw new Error("Keyword creation failed.");
+        }
+      }
+  
+      return {
+        message: "Ad groups and keywords created",
+        adGroups: createdAdGroupResources,
+      };
+    } catch (err: any) {
+      console.error("Bulk AdGroup Creation Error:", err);
+      throw new Error(err.message || "Failed to create ad groups");
+    }
+  }
+  
+
 }

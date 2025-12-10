@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface TabNavigationProps {
-  activeTab: 'overview' | 'campaigns' | 'create campaign';
-  setActiveTab: (tab: 'overview' | 'campaigns' | 'create campaign') => void;
+  activeTab: 'overview' | 'campaigns' | 'create_campaign' | 'create_adgroup';
+  setActiveTab: (tab: 'overview' | 'campaigns' | 'create_campaign' | 'create_adgroup') => void;
 }
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => {
@@ -27,12 +27,20 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
             Campaigns
           </button>
           <button
-            onClick={() => setActiveTab('create campaign')}
+            onClick={() => setActiveTab('create_campaign')}
             className={`py-4 border-b-2 transition ${
-              activeTab === 'create campaign' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
+              activeTab === 'create_campaign' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             Create Campaign
+          </button>
+          <button
+            onClick={() => setActiveTab('create_adgroup')}
+            className={`py-4 border-b-2 transition ${
+              activeTab === 'create_adgroup' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Create Ad group
           </button>
         </div>
       </div>
