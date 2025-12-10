@@ -6,6 +6,7 @@ import OverviewTab from './components/OverviewTab';
 import CampaignsTab from './components/CampaignsTab';
 import CreateCampaignTab from './components/CreateCampaignTab';
 import CreateAdgroupTab from './components/CreateAdgroupTab';
+import CreateAdTab from './components/CreateAdTab';
 
 type CreationStatus = {
   type: 'success' | 'error';
@@ -13,7 +14,7 @@ type CreationStatus = {
 };
 
 const GoogleAdsDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'campaigns' | 'create_campaign' | 'create_adgroup'>('create_campaign');
+  const [activeTab, setActiveTab] = useState<'overview' | 'campaigns' | 'create_campaign' | 'create_adgroup' | 'create_ad'>('create_campaign');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     campaignName: '',
@@ -140,6 +141,31 @@ const GoogleAdsDashboard = () => {
     setIsCreating(false);
   };
   
+  const handleCreateAd = async (adsPayload: any[]) => {
+    setIsCreating(true);
+    setCreationStatus(null);
+  
+    try {
+      await api.createAd({ ads: adsPayload });
+  
+      setCreationStatus({ type: "success", message: "Ads created successfully!" });
+  
+      await loadCampaigns();
+  
+      setTimeout(() => {
+        setActiveTab("campaigns");
+        setCreationStatus(null);
+      }, 1500);
+    } catch (error: any) {
+      console.error("API Error:", error);
+      setCreationStatus({
+        type: "error",
+        message: error?.response?.data?.message || "Failed to create ads",
+      });
+    }
+  
+    setIsCreating(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -178,6 +204,13 @@ const GoogleAdsDashboard = () => {
             creationStatus={creationStatus}
             isCreating={isCreating}
             handleCreateAdgroup={handleCreateAdgroup}
+          />
+        )}
+        {activeTab === 'create_ad' && (
+          <CreateAdTab
+            creationStatus={creationStatus}
+            isCreating={isCreating}
+            handleCreateAd={handleCreateAd}
           />
         )}
       </div>

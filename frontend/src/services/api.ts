@@ -27,4 +27,9 @@ export const api = {
     const response = await axios.post(`${API_BASE_URL}/adgroups`, adgroupData);
     return response.data;
   },
+
+  createAd: async (adData: any) => {
+    const response = await axios.post(`${API_BASE_URL}/ads`, adData);
+    return response.data;
+  },
 };

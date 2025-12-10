@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface CreateCampaignTabProps {
@@ -9,13 +8,13 @@ interface CreateCampaignTabProps {
   handleCreateCampaign: () => void;
 }
 
-const CreateCampaignTab: React.FC<CreateCampaignTabProps> = ({
+const CreateCampaignTab = ({
   formData,
   creationStatus,
   isCreating,
   handleInputChange,
   handleCreateCampaign,
-}) => {
+}: CreateCampaignTabProps) => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">

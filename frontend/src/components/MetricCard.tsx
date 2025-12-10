@@ -8,7 +8,7 @@ interface MetricCardProps {
   color: string;
 }
 
-const MetricCard: React.FC<MetricCardProps> = ({ icon: Icon, label, value, change, color }) => (
+const MetricCard = ({ icon: Icon, label, value, change, color }: MetricCardProps) => (
   <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
     <div className="flex items-center justify-between mb-2">
       <div className={`p-2 rounded-lg ${color}`}>

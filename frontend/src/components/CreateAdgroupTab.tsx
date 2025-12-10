@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { AlertCircle, CheckCircle2, Plus } from "lucide-react";
+import { CAMPAIGNS } from "../constants/campaigns";
 
 interface CreateAdgroupTabProps {
   creationStatus: { type: "success" | "error"; message: string } | null;
@@ -7,11 +8,11 @@ interface CreateAdgroupTabProps {
   handleCreateAdgroup: (adgroups: any[]) => void;
 }
 
-const CreateAdgroupTab: React.FC<CreateAdgroupTabProps> = ({
+const CreateAdgroupTab = ({
   creationStatus,
   isCreating,
   handleCreateAdgroup,
-}) => {
+}: CreateAdgroupTabProps) => {
   const [adGroups, setAdGroups] = useState([
     { campaign: "", adgroupName: "", defaultBid: "", keywords: "" },
   ]);
@@ -81,8 +82,11 @@ const CreateAdgroupTab: React.FC<CreateAdgroupTabProps> = ({
                   onChange={(e) => updateAdGroup(index, "campaign", e.target.value)}
                 >
                   <option value="">Select Campaign</option>
-                  <option value="23336696337">a-cam-1</option>
-                  <option value="23331511412">alex-cam</option>
+                  {CAMPAIGNS.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </select>
 
                 <input

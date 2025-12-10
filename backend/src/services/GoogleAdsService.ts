@@ -186,11 +186,13 @@ export class GoogleAdsService {
 
   async createAdGroups(adGroups: any[]) {
     try {
+      const customerId = this.customer.credentials.customer_id;
+
       // ------------------------------
       // 1. Build AdGroup Mutation Ops
       // ------------------------------
       const adGroupOperations: MutateOperation<resources.IAdGroup>[] = adGroups.map((g: any) => {
-        const campaignResource = `customers/${this.customer.credentials.customer_id}/campaigns/${g.campaignId}`;
+        const campaignResource = `customers/${customerId}/campaigns/${g.campaignId}`;
   
         return {
           entity: "ad_group",
@@ -268,5 +270,48 @@ export class GoogleAdsService {
     }
   }
   
+  async createAds(ads: any[]) {
+    try {
+      const customerId = this.customer.credentials.customer_id;
+  
+      const adOperations: MutateOperation<resources.IAdGroupAd>[] = ads.map(
+        (ad: any) => {
+          const adGroupResource = `customers/${customerId}/adGroups/${ad.adGroupId}`;
+          const finalUrls = ad.finalUrl ? [ad.finalUrl] : [];
+  
+          return {
+            entity: "ad_group_ad",
+            operation: "create",
+            resource: {
+              ad_group: adGroupResource,
+              status: enums.AdGroupAdStatus.PAUSED,
+              ad: {
+                final_urls: finalUrls,
+                responsive_search_ad: {
+                  headlines: ad.headlines.map((h: string) => ({ text: h })),
+                  descriptions: ad.descriptions.map((d: string) => ({ text: d })),
+                },
+              },
+            },
+          };
+        }
+      );
+  
+      const response = await this.customer.mutateResources(adOperations);
+  
+      return {
+        success: true,
+        result: response.mutate_operation_responses?.map((r: any) => ({
+          resource: r.ad_group_ad_result?.resource_name,
+        })),
+      };
+    } catch (error: any) {
+      console.error("Ad creation failed:", error);
+      return {
+        success: false,
+        message: error.message || "Error creating ads",
+      };
+    }
+  }  
 
 }

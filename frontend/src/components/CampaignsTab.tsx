@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Search } from 'lucide-react';
 
 interface Campaign {
@@ -16,7 +16,7 @@ interface CampaignsTabProps {
   campaigns: Campaign[];
 }
 
-const CampaignsTab: React.FC<CampaignsTabProps> = ({ campaigns }) => {
+const CampaignsTab = ({ campaigns }: CampaignsTabProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter campaigns based on the search query
