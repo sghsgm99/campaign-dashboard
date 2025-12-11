@@ -28,7 +28,13 @@ const CreateAdgroupTab = ({
 
   /** Add new Ad Group block */
   const addAdGroup = () => {
-    setAdGroups(prev => [ ...prev, { ...EMPTY_ADGROUP } ]);
+    setAdGroups(prev => [
+      ...prev,
+      { 
+        ...EMPTY_ADGROUP,
+        keywords: { broad: "", phrase: "", exact: "" }
+      }
+    ]);
   };
 
   /** Update top-level fields */
