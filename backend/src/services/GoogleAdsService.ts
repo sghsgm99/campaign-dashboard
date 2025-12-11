@@ -243,6 +243,20 @@ export class GoogleAdsService {
             },
           });
         });
+        group.negativeKeywords.broad.forEach((kw: string) => {
+          keywordOperations.push({
+            entity: "ad_group_criterion",
+            operation: "create",
+            resource: {
+              ad_group: adGroupResource,
+              negative: true,
+              keyword: {
+                text: kw,
+                match_type: enums.KeywordMatchType.BROAD,
+              },
+            },
+          });
+        });
   
         // Add Phrase match keywords
         group.keywords.phrase.forEach((kw: string) => {
@@ -259,6 +273,20 @@ export class GoogleAdsService {
             },
           });
         });
+        group.negativeKeywords.phrase.forEach((kw: string) => {
+          keywordOperations.push({
+            entity: "ad_group_criterion",
+            operation: "create",
+            resource: {
+              ad_group: adGroupResource,
+              negative: true,
+              keyword: {
+                text: kw,
+                match_type: enums.KeywordMatchType.PHRASE,
+              },
+            },
+          });
+        });
   
         // Add Exact match keywords
         group.keywords.exact.forEach((kw: string) => {
@@ -268,6 +296,20 @@ export class GoogleAdsService {
             resource: {
               ad_group: adGroupResource,
               status: enums.AdGroupCriterionStatus.ENABLED,
+              keyword: {
+                text: kw,
+                match_type: enums.KeywordMatchType.EXACT,
+              },
+            },
+          });
+        });
+        group.negativeKeywords.exact.forEach((kw: string) => {
+          keywordOperations.push({
+            entity: "ad_group_criterion",
+            operation: "create",
+            resource: {
+              ad_group: adGroupResource,
+              negative: true,
               keyword: {
                 text: kw,
                 match_type: enums.KeywordMatchType.EXACT,

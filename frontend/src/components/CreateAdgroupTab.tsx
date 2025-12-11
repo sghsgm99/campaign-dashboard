@@ -17,6 +17,11 @@ const EMPTY_ADGROUP = {
     phrase: "",
     exact: "",
   },
+  negativeKeywords: {
+    broad: "",
+    phrase: "",
+    exact: "",
+  },
 };
 
 const CreateAdgroupTab = ({
@@ -59,29 +64,37 @@ const CreateAdgroupTab = ({
     });
   };
 
+  const updateNegativeKeyword = (
+    index: number,
+    type: "broad" | "phrase" | "exact",
+    value: string
+  ) => {
+    setAdGroups(prev => {
+      const updated = [...prev];
+      updated[index].negativeKeywords[type] = value;
+      return updated;
+    });
+  };  
+
   /** Submit payload */
   const submitAdGroups = () => {
     const payload = adGroups.map(g => ({
       campaignId: g.campaignId,
       name: g.adgroupName,
       defaultBid: parseFloat(g.defaultBid) || 0,
+    
       keywords: {
-        broad: g.keywords.broad
-          .split("\n")
-          .map(k => k.trim())
-          .filter(Boolean),
-
-        phrase: g.keywords.phrase
-          .split("\n")
-          .map(k => k.trim())
-          .filter(Boolean),
-
-        exact: g.keywords.exact
-          .split("\n")
-          .map(k => k.trim())
-          .filter(Boolean),
+        broad: g.keywords.broad.split("\n").map(k => k.trim()).filter(Boolean),
+        phrase: g.keywords.phrase.split("\n").map(k => k.trim()).filter(Boolean),
+        exact: g.keywords.exact.split("\n").map(k => k.trim()).filter(Boolean),
       },
-    }));
+    
+      negativeKeywords: {
+        broad: g.negativeKeywords.broad.split("\n").map(k => k.trim()).filter(Boolean),
+        phrase: g.negativeKeywords.phrase.split("\n").map(k => k.trim()).filter(Boolean),
+        exact: g.negativeKeywords.exact.split("\n").map(k => k.trim()).filter(Boolean),
+      },
+    }));    
 
     handleCreateAdgroup(payload);
   };
@@ -112,10 +125,11 @@ const CreateAdgroupTab = ({
 
         {/* Form blocks */}
         <div className="space-y-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Ad Groups</h3>
-
           {adGroups.map((g, index) => (
             <div key={index} className="space-y-5 mb-8 border-b pb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Ad Group#{index + 1}
+              </h3>
               
               {/* Campaign, Name, Bid */}
               <div className="grid grid-cols-3 gap-4">
@@ -152,6 +166,9 @@ const CreateAdgroupTab = ({
               </div>
 
               {/* Keyword Groups Section */}
+              <p className="font-semibold text-gray-900">
+                Keywords
+              </p>
               <div className="grid grid-cols-3 gap-4">
                 
                 {/* Broad Match */}
@@ -181,6 +198,41 @@ const CreateAdgroupTab = ({
                   onChange={e => updateKeyword(index, "exact", e.target.value)}
                 />
               </div>
+
+              {/* Negative Keyword Groups Section */}
+              <p className="font-semibold text-gray-900">
+                Negative Keywords
+              </p>
+              <div className="grid grid-cols-3 gap-4">
+                
+                {/* Broad Match Negative */}
+                <textarea
+                  className="w-full px-4 py-2 border rounded-lg"
+                  rows={4}
+                  placeholder="Broad Negative Keywords&#10;keyword1&#10;keyword2"
+                  value={g.negativeKeywords.broad}
+                  onChange={e => updateNegativeKeyword(index, "broad", e.target.value)}
+                />
+
+                {/* Phrase Match Negative */}
+                <textarea
+                  className="w-full px-4 py-2 border rounded-lg"
+                  rows={4}
+                  placeholder="Phrase Negative Keywords&#10;keyword1&#10;keyword2"
+                  value={g.negativeKeywords.phrase}
+                  onChange={e => updateNegativeKeyword(index, "phrase", e.target.value)}
+                />
+
+                {/* Exact Match Negative */}
+                <textarea
+                  className="w-full px-4 py-2 border rounded-lg"
+                  rows={4}
+                  placeholder="Exact Negative Keywords&#10;keyword1&#10;keyword2"
+                  value={g.negativeKeywords.exact}
+                  onChange={e => updateNegativeKeyword(index, "exact", e.target.value)}
+                />
+              </div>
+
             </div>
           ))}
 
