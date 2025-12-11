@@ -36,7 +36,7 @@ export class GoogleAdsService {
         FROM campaign
         WHERE campaign.status != 'REMOVED'
         ORDER BY campaign.id DESC
-        LIMIT 20
+        LIMIT 10
       `;
 
       const data = await this.customer.query(query);

@@ -1,5 +1,13 @@
 export const CAMPAIGNS = [
   {
+    id: "23347970784",
+    name: "alex-test-1",
+    adgroups: [
+      { id: "196792911024", name: "at1-grp1" },
+      { id: "196792911064", name: "at1-grp2" }
+    ],
+  },
+  {
     id: "23336696337",
     name: "a-cam-1",
     adgroups: [
@@ -23,12 +31,5 @@ export const CAMPAIGNS = [
     adgroups: [
       { id: "195318872128", name: "" }
     ],
-  },
-  {
-    id: "23331532781",
-    name: "alex-cam1",
-    adgroups: [
-      { id: "195318872128", name: "" }
-    ],
-  },
+  },  
 ];

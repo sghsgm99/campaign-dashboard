@@ -186,6 +186,7 @@ const GoogleAdsDashboard = () => {
             creationStatus={creationStatus}
             isCreating={isCreating}
             handleCreateAdgroup={handleCreateAdgroup}
+            campaignList={campaigns}
           />
         )}
         {activeTab === Tabs.CREATE_AD && (
