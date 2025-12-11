@@ -1,6 +1,8 @@
+import { Tabs, TabType } from "../constants/tabs";
+
 interface TabNavigationProps {
-  activeTab: 'overview' | 'campaigns' | 'create_campaign' | 'create_adgroup' | 'create_ad';
-  setActiveTab: (tab: 'overview' | 'campaigns' | 'create_campaign' | 'create_adgroup' | 'create_ad') => void;
+  activeTab: TabType;
+  setActiveTab: (tab: TabType) => void;
 }
 
 const TabNavigation = ({ activeTab, setActiveTab }: TabNavigationProps) => {
@@ -8,46 +10,19 @@ const TabNavigation = ({ activeTab, setActiveTab }: TabNavigationProps) => {
     <div className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex gap-8">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`py-4 border-b-2 transition ${
-              activeTab === 'overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('campaigns')}
-            className={`py-4 border-b-2 transition ${
-              activeTab === 'campaigns' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Campaigns
-          </button>
-          <button
-            onClick={() => setActiveTab('create_campaign')}
-            className={`py-4 border-b-2 transition ${
-              activeTab === 'create_campaign' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Create Campaign
-          </button>
-          <button
-            onClick={() => setActiveTab('create_adgroup')}
-            className={`py-4 border-b-2 transition ${
-              activeTab === 'create_adgroup' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Create Ad group
-          </button>
-          <button
-            onClick={() => setActiveTab('create_ad')}
-            className={`py-4 border-b-2 transition ${
-              activeTab === 'create_ad' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Create Ad
-          </button>
+          {Object.values(Tabs).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 ${
+                activeTab === tab
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600"
+              }`}
+            >
+              {tab.replace("_", " ").toUpperCase()}
+            </button>
+          ))}
         </div>
       </div>
     </div>
