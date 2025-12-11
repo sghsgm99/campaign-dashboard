@@ -59,16 +59,18 @@ export class GoogleAdsService {
 
   // Create campaign workflow
   async createCampaign(payload: any) {
-    const { name, budget, keywords, headlines, descriptions, finalUrl } =
-      payload;
-
-    // Create budget
-    const budgetResourceName = ResourceNames.campaignBudget(
-      this.customer.credentials.customer_id,
-      "-1",
-    );
-
-    const operations: MutateOperation<resources.ICampaignBudget | resources.ICampaign>[] = [
+    const { name, budget, broadKeywords = [], phraseKeywords = [], exactKeywords = [] } = payload;
+  
+    const customerId = this.customer.credentials.customer_id;
+  
+    // -----------------------------
+    // 1. Create Campaign Budget
+    // -----------------------------
+    const budgetResourceName = ResourceNames.campaignBudget(customerId, "-1");
+  
+    const operations: MutateOperation<
+      resources.ICampaignBudget | resources.ICampaign
+    >[] = [
       {
         entity: "campaign_budget",
         operation: "create",
@@ -97,92 +99,86 @@ export class GoogleAdsService {
         },
       },
     ];
-
+  
     const campaignResult = await this.customer.mutateResources(operations);
+  
     const campaignResource =
       campaignResult.mutate_operation_responses?.[1]?.campaign_result
         ?.resource_name;
-
+  
     if (!campaignResource) {
       throw new Error("Failed to create campaign.");
     }
-
-    // Create ad group
-    const adGroupOperations: MutateOperation<resources.IAdGroup>[] = [
-      {
-        entity: "ad_group",
+  
+    // -----------------------------------------
+    // 2. Build ALL Negative Keywords Corrections
+    // -----------------------------------------
+    const negativeOps: MutateOperation<resources.ICampaignCriterion>[] = [];
+  
+    // BROAD NEGATIVES
+    broadKeywords.forEach((kw: string) => {
+      negativeOps.push({
+        entity: "campaign_criterion",
         operation: "create",
         resource: {
-          name: `${name} - AdGroup`,
           campaign: campaignResource,
-          status: enums.AdGroupStatus.ENABLED,
-          type: enums.AdGroupType.SEARCH_STANDARD,
-          cpc_bid_micros: toMicros(budget / 2),
-        },
-      },
-    ];
-
-    const adGroupResult = await this.customer.mutateResources(adGroupOperations);
-    const adGroupResource =
-      adGroupResult.mutate_operation_responses?.[0]?.ad_group_result
-        ?.resource_name;
-
-    if (!adGroupResource) {
-      throw new Error("Failed to create ad group.");
-    }
-
-    // Create keywords
-    let keywordResources: string[] = [];
-
-    if (keywords.length > 0) {
-      const keywordOps: MutateOperation<resources.IAdGroupCriterion>[] =
-        keywords.map((kw: string) => ({
-          entity: "ad_group_criterion",
-          operation: "create",
-          resource: {
-            ad_group: adGroupResource,
-            status: enums.AdGroupCriterionStatus.ENABLED,
-            keyword: {
-              text: kw,
-              match_type: enums.KeywordMatchType.BROAD,
-            },
-          },
-        }));
-
-      const keywordResult = await this.customer.mutateResources(keywordOps);
-
-      keywordResources =
-        keywordResult.mutate_operation_responses?.map(
-          (k: any) => k.ad_group_criterion_result?.resource_name
-        ) || [];
-    }
-
-    // Create RSA
-    if (finalUrl && headlines?.length && descriptions?.length) {
-      await this.customer.mutateResources([
-        {
-          entity: "ad_group_ad",
-          operation: "create",
-          resource: {
-            ad_group: adGroupResource,
-            status: enums.AdGroupAdStatus.PAUSED,
-            ad: {
-              final_urls: [finalUrl],
-              responsive_search_ad: {
-                headlines: headlines.map((h: string) => ({ text: h })),
-                descriptions: descriptions.map((d: string) => ({ text: d })),
-              },
-            },
+          negative: true,
+          keyword: {
+            text: kw,
+            match_type: enums.KeywordMatchType.BROAD,
           },
         },
-      ]);
+      });
+    });
+  
+    // PHRASE NEGATIVES
+    phraseKeywords.forEach((kw: string) => {
+      negativeOps.push({
+        entity: "campaign_criterion",
+        operation: "create",
+        resource: {
+          campaign: campaignResource,
+          negative: true,
+          keyword: {
+            text: kw,
+            match_type: enums.KeywordMatchType.PHRASE,
+          },
+        },
+      });
+    });
+  
+    // EXACT NEGATIVES
+    exactKeywords.forEach((kw: string) => {
+      negativeOps.push({
+        entity: "campaign_criterion",
+        operation: "create",
+        resource: {
+          campaign: campaignResource,
+          negative: true,
+          keyword: {
+            text: kw,
+            match_type: enums.KeywordMatchType.EXACT,
+          },
+        },
+      });
+    });
+  
+    // ---------------------------------------
+    // 3. Create Campaign Negative Keywords
+    // ---------------------------------------
+    if (negativeOps.length > 0) {
+      await this.customer.mutateResources(negativeOps);
     }
-
+  
     return {
       campaign: campaignResource,
-      adGroup: adGroupResource,
+      negativeKeywordsAdded: {
+        broad: broadKeywords,
+        phrase: phraseKeywords,
+        exact: exactKeywords,
+      },
     };
-  }
+  }  
 
   async createAdGroups(adGroups: any[]) {
     try {

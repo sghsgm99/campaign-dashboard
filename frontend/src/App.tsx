@@ -21,14 +21,9 @@ const GoogleAdsDashboard = () => {
     campaignType: 'SEARCH',
     dailyBudget: '',
     targetLocation: '',
-    keywords: '',
-    adHeadline1: '',
-    adHeadline2: '',
-    adHeadline3: '',
-    adDescription1: '',
-    adDescription2: '',
-    finalUrl: '',
-    biddingStrategy: 'MAXIMIZE_CLICKS',
+    broadKeywords: '',
+    phraseKeywords: '',
+    exactKeywords: ''
   });
   const [isCreating, setIsCreating] = useState(false);
   const [creationStatus, setCreationStatus] = useState<CreationStatus | null>(null);
@@ -52,7 +47,7 @@ const GoogleAdsDashboard = () => {
   };
 
   const handleCreateCampaign = async () => {
-    if (!formData.campaignName || !formData.dailyBudget || !formData.finalUrl) {
+    if (!formData.campaignName || !formData.dailyBudget) {
       setCreationStatus({ type: 'error', message: 'Please fill in all required fields' });
       return;
     }
@@ -66,18 +61,9 @@ const GoogleAdsDashboard = () => {
         type: formData.campaignType,
         budget: parseFloat(formData.dailyBudget),
         location: formData.targetLocation,
-        keywords: formData.keywords.split("\n").map(k => k.trim()).filter(k => k),
-        headlines: [
-          formData.adHeadline1,
-          formData.adHeadline2,
-          formData.adHeadline3,
-        ].filter(Boolean),
-        descriptions: [
-          formData.adDescription1,
-          formData.adDescription2,
-        ].filter(Boolean),
-        finalUrl: formData.finalUrl,
-        biddingStrategy: formData.biddingStrategy,
+        broadKeywords: formData.broadKeywords.split("\n").map(k => k.trim()).filter(k => k),
+        phraseKeywords: formData.phraseKeywords.split("\n").map(k => k.trim()).filter(k => k),
+        exactKeywords: formData.exactKeywords.split("\n").map(k => k.trim()).filter(k => k),
       };
 
       await api.createCampaign(payload);
@@ -90,14 +76,9 @@ const GoogleAdsDashboard = () => {
         campaignType: 'SEARCH',
         dailyBudget: '',
         targetLocation: '',
-        keywords: '',
-        adHeadline1: '',
-        adHeadline2: '',
-        adHeadline3: '',
-        adDescription1: '',
-        adDescription2: '',
-        finalUrl: '',
-        biddingStrategy: 'MAXIMIZE_CLICKS',
+        broadKeywords: '',
+        phraseKeywords: '',
+        exactKeywords: '',
       });
 
       setTimeout(() => {

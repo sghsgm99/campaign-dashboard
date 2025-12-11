@@ -1,7 +1,15 @@
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface CreateCampaignTabProps {
-  formData: any;
+  formData: {
+    campaignName: string;
+    campaignType: string;
+    dailyBudget: string;
+    targetLocation: string;
+    broadKeywords: string;
+    phraseKeywords: string;
+    exactKeywords: string;
+  };
   creationStatus: { type: 'success' | 'error'; message: string } | null;
   isCreating: boolean;
   handleInputChange: (e: any) => void;
@@ -20,6 +28,7 @@ const CreateCampaignTab = ({
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Create New Campaign</h2>
 
+        {/* Status Message */}
         {creationStatus && (
           <div
             className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
@@ -84,73 +93,38 @@ const CreateCampaignTab = ({
             />
           </div>
 
-          {/* Keywords */}
+          {/* Negative Keywords */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Keywords</h3>
-            <textarea
-              name="keywords"
-              value={formData.keywords}
-              onChange={handleInputChange}
-              rows={4}
-              placeholder="keyword1\nkeyword2\nkeyword3"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-          </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Negative Keywords</h3>
 
-          {/* Ad Content */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Ad Content</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <textarea
+                name="broadKeywords"
+                value={formData.broadKeywords}
+                onChange={handleInputChange}
+                rows={4}
+                placeholder="Broad Match Keywords&#10;keyword1&#10;keyword2"
+                className="w-full px-4 py-2 border rounded-lg"
+              />
 
-            <input
-              name="adHeadline1"
-              value={formData.adHeadline1}
-              onChange={handleInputChange}
-              placeholder="Headline 1"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
+              <textarea
+                name="phraseKeywords"
+                value={formData.phraseKeywords}
+                onChange={handleInputChange}
+                rows={4}
+                placeholder="Phrase Match Keywords&#10;keyword1&#10;keyword2"
+                className="w-full px-4 py-2 border rounded-lg"
+              />
 
-            <input
-              name="adHeadline2"
-              value={formData.adHeadline2}
-              onChange={handleInputChange}
-              placeholder="Headline 2"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-
-            <input
-              name="adHeadline3"
-              value={formData.adHeadline3}
-              onChange={handleInputChange}
-              placeholder="Headline 3"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-
-            <textarea
-              name="adDescription1"
-              value={formData.adDescription1}
-              onChange={handleInputChange}
-              rows={2}
-              placeholder="Description 1"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-
-            <textarea
-              name="adDescription2"
-              value={formData.adDescription2}
-              onChange={handleInputChange}
-              rows={2}
-              placeholder="Description 2"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-
-            <input
-              name="finalUrl"
-              type="url"
-              value={formData.finalUrl}
-              onChange={handleInputChange}
-              placeholder="https://example.com"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
+              <textarea
+                name="exactKeywords"
+                value={formData.exactKeywords}
+                onChange={handleInputChange}
+                rows={4}
+                placeholder="Exact Match Keywords&#10;keyword1&#10;keyword2"
+                className="w-full px-4 py-2 border rounded-lg"
+              />
+            </div>
           </div>
 
           {/* Buttons */}
@@ -163,11 +137,7 @@ const CreateCampaignTab = ({
               {isCreating ? 'Creating...' : 'Create Campaign'}
             </button>
 
-            <button
-              className="px-6 py-3 border border-gray-300 rounded-lg"
-            >
-              Cancel
-            </button>
+            <button className="px-6 py-3 border border-gray-300 rounded-lg">Cancel</button>
           </div>
         </div>
       </div>

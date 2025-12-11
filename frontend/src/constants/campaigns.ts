@@ -13,6 +13,22 @@ export const CAMPAIGNS = [
     name: "book-cam1",
     adgroups: [
       { id: "195318872128", name: "book-cam1 - AdGroup" },
+      { id: "189609182629", name: "match-check" },
+      { id: "193665889887", name: "bc-group1" },
+    ],
+  },
+  {
+    id: "23331511412",
+    name: "alex-cam",
+    adgroups: [
+      { id: "195318872128", name: "" }
+    ],
+  },
+  {
+    id: "23331532781",
+    name: "alex-cam1",
+    adgroups: [
+      { id: "195318872128", name: "" }
     ],
   },
 ];
