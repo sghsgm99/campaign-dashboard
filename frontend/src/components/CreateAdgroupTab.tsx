@@ -37,7 +37,8 @@ const CreateAdgroupTab = ({
       ...prev,
       { 
         ...EMPTY_ADGROUP,
-        keywords: { broad: "", phrase: "", exact: "" }
+        keywords: { broad: "", phrase: "", exact: "" },
+        negativeKeywords: { broad: "", phrase: "", exact: "" }
       }
     ]);
   };
