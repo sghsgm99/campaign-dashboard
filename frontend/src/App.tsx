@@ -109,7 +109,7 @@ const GoogleAdsDashboard = () => {
       await loadCampaigns();
   
       setTimeout(() => {
-        setActiveTab(Tabs.CREATE_CAMPAIGN);
+        setActiveTab(Tabs.CAMPAIGNS);
         setCreationStatus(null);
       }, 1500);
     } catch (error: any) {
@@ -135,7 +135,7 @@ const GoogleAdsDashboard = () => {
       await loadCampaigns();
   
       setTimeout(() => {
-        setActiveTab(Tabs.CREATE_CAMPAIGN);
+        setActiveTab(Tabs.CAMPAIGNS);
         setCreationStatus(null);
       }, 1500);
     } catch (error: any) {
@@ -170,9 +170,9 @@ const GoogleAdsDashboard = () => {
       <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {activeTab === 'overview' && <OverviewTab campaigns={campaigns} />}
-        {activeTab === Tabs.CREATE_CAMPAIGN && <CampaignsTab campaigns={campaigns} />}
-        {activeTab === 'create_campaign' && (
+        {activeTab === Tabs.OVERVIEW && <OverviewTab campaigns={campaigns} />}
+        {activeTab === Tabs.CAMPAIGNS && <CampaignsTab campaigns={campaigns} />}
+        {activeTab === Tabs.CREATE_CAMPAIGN && (
           <CreateCampaignTab
             formData={formData}
             creationStatus={creationStatus}
@@ -181,14 +181,14 @@ const GoogleAdsDashboard = () => {
             handleCreateCampaign={handleCreateCampaign}
           />
         )}
-        {activeTab === 'create_adgroup' && (
+        {activeTab === Tabs.CREATE_ADGROUP && (
           <CreateAdgroupTab
             creationStatus={creationStatus}
             isCreating={isCreating}
             handleCreateAdgroup={handleCreateAdgroup}
           />
         )}
-        {activeTab === 'create_ad' && (
+        {activeTab === Tabs.CREATE_AD && (
           <CreateAdTab
             creationStatus={creationStatus}
             isCreating={isCreating}
