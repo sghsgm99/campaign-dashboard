@@ -1,23 +1,35 @@
 import { useState } from "react";
 import { AlertCircle, CheckCircle2, Plus } from "lucide-react";
-import { CAMPAIGNS } from "../constants/campaigns";
 
-// Create a fresh empty ad each time (deep clone)
 const createEmptyAd = () => ({
   campaignId: "",
   adGroupId: "",
   finalUrl: "",
   headlines: ["", "", ""],
   descriptions: ["", ""],
+  adGroups: [] as { id: string; name: string }[],  // store ad groups per ad row
 });
 
 interface CreateAdTabProps {
   creationStatus: { type: "success" | "error"; message: string } | null;
   isCreating: boolean;
   handleCreateAd: (ads: any[]) => void;
+  campaignList: any[];
+  loadAdGroups: (campaignId: string) => Promise<AdGroup[]>;
 }
 
-const CreateAdTab = ({ creationStatus, isCreating, handleCreateAd }: CreateAdTabProps) => {
+interface AdGroup {
+  id: string;
+  name: string;
+}
+
+const CreateAdTab = ({
+  creationStatus,
+  isCreating,
+  handleCreateAd,
+  campaignList,
+  loadAdGroups
+}: CreateAdTabProps) => {
 
   const [ads, setAds] = useState([createEmptyAd()]);
 
@@ -25,17 +37,31 @@ const CreateAdTab = ({ creationStatus, isCreating, handleCreateAd }: CreateAdTab
     setAds(prev => [...prev, createEmptyAd()]);
   };
 
+  const handleCampaignSelect = async (index: number, campaignId: string) => {
+    // reset
+    setAds(prev => {
+      const updated = [...prev];
+      updated[index].campaignId = campaignId;
+      updated[index].adGroupId = "";
+      updated[index].adGroups = [];
+      return updated;
+    });
+  
+    if (!campaignId) return;
+  
+    const adGroups = await loadAdGroups(campaignId);
+  
+    setAds(prev => {
+      const updated = [...prev];
+      updated[index].adGroups = adGroups;
+      return updated;
+    });
+  };  
+
   const updateField = (index: number, field: string, value: string) => {
     setAds(prev => {
       const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        [field]: value
-      };
-
-      if (field === "campaignId") {
-        updated[index].adGroupId = "";
-      }
+      updated[index] = { ...updated[index], [field]: value };
       return updated;
     });
   };
@@ -43,28 +69,16 @@ const CreateAdTab = ({ creationStatus, isCreating, handleCreateAd }: CreateAdTab
   const updateHeadline = (adIndex: number, hIndex: number, value: string) => {
     setAds(prev => {
       const updated = [...prev];
-      const headlines = [...updated[adIndex].headlines]; // clone array
-      headlines[hIndex] = value;
-
-      updated[adIndex] = {
-        ...updated[adIndex],
-        headlines
-      };
-      return updated;
+      updated[adIndex].headlines[hIndex] = value;
+      return [...updated];
     });
   };
 
   const updateDescription = (adIndex: number, dIndex: number, value: string) => {
     setAds(prev => {
       const updated = [...prev];
-      const descriptions = [...updated[adIndex].descriptions]; // clone array
-      descriptions[dIndex] = value;
-
-      updated[adIndex] = {
-        ...updated[adIndex],
-        descriptions
-      };
-      return updated;
+      updated[adIndex].descriptions[dIndex] = value;
+      return [...updated];
     });
   };
 
@@ -78,10 +92,13 @@ const CreateAdTab = ({ creationStatus, isCreating, handleCreateAd }: CreateAdTab
     handleCreateAd(payload);
   };
 
+  // -----------------------------------
+  // UI Rendering
+  // -----------------------------------
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-
+      <div className="bg-white rounded-lg shadow-sm border p-8">
+        
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Create Multiple RSAs</h2>
 
         {creationStatus && (
@@ -101,124 +118,110 @@ const CreateAdTab = ({ creationStatus, isCreating, handleCreateAd }: CreateAdTab
           </div>
         )}
 
-        {ads.map((ad, index) => {
-          const selectedCampaign = CAMPAIGNS.find(c => c.id === ad.campaignId);
+        {ads.map((ad, index) => (
+          <div key={index} className="mb-8 pb-6 border-b">
+            <h3 className="text-lg font-semibold mb-4">
+              Ad #{index + 1}
+            </h3>
 
-          return (
-            <div key={index} className="mb-8 pb-6 border-b">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Ad #{index + 1}
-              </h3>
+            {/* Campaign & Ad Group */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              
+              {/* Campaign Select */}
+              <select
+                className="px-4 py-2 border rounded-lg"
+                value={ad.campaignId}
+                onChange={e => handleCampaignSelect(index, e.target.value)}
+              >
+                <option value="">Select Campaign</option>
+                {campaignList.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
 
-              {/* Campaign + Ad Group */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <select
-                  className="px-4 py-2 border rounded-lg"
-                  value={ad.campaignId}
-                  onChange={e => updateField(index, "campaignId", e.target.value)}
-                >
-                  <option value="">Select Campaign</option>
-                  {CAMPAIGNS.map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+              {/* Ad Group Select */}
+              <select
+                className="px-4 py-2 border rounded-lg"
+                value={ad.adGroupId}
+                onChange={e => updateField(index, "adGroupId", e.target.value)}
+                disabled={!ad.campaignId}
+              >
+                <option value="">
+                  {ad.campaignId ? "Select Ad Group" : "Select campaign first"}
+                </option>
 
-                <select
-                  className="px-4 py-2 border rounded-lg"
-                  value={ad.adGroupId}
-                  onChange={e => updateField(index, "adGroupId", e.target.value)}
-                  disabled={!selectedCampaign}
-                >
-                  <option value="">Select Ad Group</option>
-                  {selectedCampaign?.adgroups.map(g => (
-                    <option key={g.id} value={g.id}>
-                      {g.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Final URL */}
-              <input
-                type="text"
-                className="w-full px-4 py-2 border rounded-lg mb-6"
-                placeholder="Final URL"
-                value={ad.finalUrl}
-                onChange={e => updateField(index, "finalUrl", e.target.value)}
-              />
-
-              {/* Headlines */}
-              <div className="space-y-3 mb-6">
-                <p className="font-semibold text-gray-900">
-                  Headlines
-                </p>
-
-                {ad.headlines.map((h, hIndex) => {
-                  const count = h.length;
-                  const isOver = count > 30;
-                  return (
-                    <div key={hIndex}>
-                      <input
-                        type="text"
-                        className={`w-full px-4 py-2 border rounded-lg ${
-                          isOver ? "border-red-500" : ""
-                        }`}
-                        placeholder={`Headline ${hIndex + 1}`}
-                        value={h}
-                        onChange={e =>
-                          updateHeadline(index, hIndex, e.target.value)
-                        }
-                      />
-                      <p
-                        className={`text-sm text-right ${
-                          isOver ? "text-red-600" : "text-gray-500"
-                        }`}
-                      >
-                        {count}/30
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Descriptions */}
-              <div className="space-y-3">
-                <p className="font-semibold text-gray-900">
-                  Descriptions
-                </p>
-
-                {ad.descriptions.map((d, dIndex) => {
-                  const count = d.length;
-                  const isOver = count > 90;
-                  return (
-                    <div key={dIndex}>
-                      <textarea
-                        rows={2}
-                        className={`w-full px-4 py-2 border rounded-lg ${
-                          isOver ? "border-red-500" : ""
-                        }`}
-                        placeholder={`Description ${dIndex + 1}`}
-                        value={d}
-                        onChange={e =>
-                          updateDescription(index, dIndex, e.target.value)
-                        }
-                      />
-                      <p
-                        className={`text-sm text-right ${
-                          isOver ? "text-red-600" : "text-gray-500"
-                        }`}
-                      >
-                        {count}/90
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+                {ad.adGroups.map(ag => (
+                  <option key={ag.id} value={ag.id}>
+                    {ag.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          );
-        })}
+
+            {/* Final URL */}
+            <input
+              type="text"
+              className="w-full px-4 py-2 border rounded-lg mb-6"
+              placeholder="Final URL"
+              value={ad.finalUrl}
+              onChange={e => updateField(index, "finalUrl", e.target.value)}
+            />
+
+            {/* Headlines */}
+            <div className="space-y-3 mb-6">
+              <p className="font-semibold">Headlines</p>
+              {ad.headlines.map((h, hIndex) => {
+                const count = h.length;
+                return (
+                  <div key={hIndex}>
+                    <input
+                      type="text"
+                      className={`w-full px-4 py-2 border rounded-lg ${
+                        count > 30 ? "border-red-500" : ""
+                      }`}
+                      placeholder={`Headline ${hIndex + 1}`}
+                      value={h}
+                      onChange={e =>
+                        updateHeadline(index, hIndex, e.target.value)
+                      }
+                    />
+                    <p className={`text-sm text-right ${count > 30 ? "text-red-600" : "text-gray-500"}`}>
+                      {count}/30
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Descriptions */}
+            <div className="space-y-3">
+              <p className="font-semibold">Descriptions</p>
+              {ad.descriptions.map((d, dIndex) => {
+                const count = d.length;
+                return (
+                  <div key={dIndex}>
+                    <textarea
+                      rows={2}
+                      className={`w-full px-4 py-2 border rounded-lg ${
+                        count > 90 ? "border-red-500" : ""
+                      }`}
+                      placeholder={`Description ${dIndex + 1}`}
+                      value={d}
+                      onChange={e =>
+                        updateDescription(index, dIndex, e.target.value)
+                      }
+                    />
+                    <p className={`text-sm text-right ${count > 90 ? "text-red-600" : "text-gray-500"}`}>
+                      {count}/90
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         <button
           type="button"
@@ -228,19 +231,13 @@ const CreateAdTab = ({ creationStatus, isCreating, handleCreateAd }: CreateAdTab
           <Plus size={16} /> Add Another Ad
         </button>
 
-        <div className="flex gap-4">
-          <button
-            onClick={submitAds}
-            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg"
-            disabled={isCreating}
-          >
-            {isCreating ? "Creating..." : "Create Ads"}
-          </button>
-
-          <button className="px-6 py-3 border border-gray-300 rounded-lg">
-            Cancel
-          </button>
-        </div>
+        <button
+          onClick={submitAds}
+          className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg"
+          disabled={isCreating}
+        >
+          {isCreating ? "Creating..." : "Create Ads"}
+        </button>
 
       </div>
     </div>

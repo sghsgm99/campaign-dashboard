@@ -149,6 +149,16 @@ const GoogleAdsDashboard = () => {
     setIsCreating(false);
   };
 
+  const loadAdGroups = async (campaignId: string) => {
+    try {
+      const data = await api.getAdGroupsByCampaign(campaignId);
+      return data;
+    } catch (err) {
+      console.error("Failed to load ad groups:", err);
+      return [];
+    }
+  };  
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
@@ -194,6 +204,8 @@ const GoogleAdsDashboard = () => {
             creationStatus={creationStatus}
             isCreating={isCreating}
             handleCreateAd={handleCreateAd}
+            campaignList={campaigns}
+            loadAdGroups={loadAdGroups}  // NEW
           />
         )}
       </div>

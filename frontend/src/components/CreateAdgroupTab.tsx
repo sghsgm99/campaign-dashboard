@@ -5,7 +5,7 @@ interface CreateAdgroupTabProps {
   creationStatus: { type: "success" | "error"; message: string } | null;
   isCreating: boolean;
   handleCreateAdgroup: (adgroups: any[]) => void;
-  campaignList: any[]
+  campaignList: any[];
 }
 
 const EMPTY_ADGROUP = {

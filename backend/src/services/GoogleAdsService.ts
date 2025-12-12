@@ -35,7 +35,7 @@ export class GoogleAdsService {
           metrics.cost_micros
         FROM campaign
         WHERE campaign.status != 'REMOVED'
-        ORDER BY campaign.id DESC
+        ORDER BY campaign.start_date DESC
         LIMIT 10
       `;
 
@@ -56,6 +56,34 @@ export class GoogleAdsService {
       throw new Error("Failed to fetch campaigns");
     }
   }
+
+  async getAdGroups(campaignId: string) {
+    try {
+      const customerId = this.customer.credentials.customer_id;
+
+      const resourceName = `customers/${customerId}/campaigns/${campaignId}`;
+  
+      const query = `
+        SELECT
+          ad_group.id,
+          ad_group.name
+        FROM ad_group
+        WHERE ad_group.campaign = '${resourceName}'
+          AND ad_group.status != 'REMOVED'
+        ORDER BY ad_group.id DESC
+      `;
+  
+      const data = await this.customer.query(query);
+  
+      return data.map((item: any) => ({
+        id: item.ad_group.id,
+        name: item.ad_group.name,
+      }));
+    } catch (err) {
+      console.error("Google API Error:", err);
+      throw new Error("Failed to fetch ad groups");
+    }
+  }  
 
   // Create campaign workflow
   async createCampaign(payload: any) {

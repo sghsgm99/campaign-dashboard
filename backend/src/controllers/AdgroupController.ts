@@ -25,5 +25,18 @@ export class AdgroupController {
         details: err.message,
       });
     }
+  }
+
+  static async getByCampaignId(req: Request, res: Response) {
+    try {
+      const { campaignId } = req.params;
+  
+      const adgroups = await googleAds.getAdGroups(campaignId);
+
+      return res.json(adgroups);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, error: "Failed to load ad groups" });
+    }
   }  
 }
