@@ -7,17 +7,34 @@ export class CampaignService {
 
   async getAll() {
     return CampaignRepository.findAll();
-    //return this.googleAds.getCampaigns();    
+    //return this.googleAds.getCampaigns();
   }
 
   async create(payload: CreateCampaignDTO) {
-    const result = "ok"; //await this.googleAds.createCampaign(payload);
+    const result = await this.googleAds.createCampaign(payload);
+
+    const campaignResource = result?.campaign;
+
+    if (!campaignResource) {
+      throw new Error("Failed to get campaign resource name from result.");
+    }
+  
+    const campaignId = campaignResource.split('/').pop();
+
+    if (!campaignId) {
+      throw new Error("Failed to extract campaignId from resource name.");
+    }
+  
+    if (!campaignId) {
+      throw new Error("Failed to extract campaignId from resource name.");
+    }
 
     await CampaignRepository.save({
       name: payload.name,
       status: "PAUSED",
       channelType: payload.type,
-      budget: payload.budget
+      budget: payload.budget,
+      googleCampaignId: campaignId
     });
 
     return result;

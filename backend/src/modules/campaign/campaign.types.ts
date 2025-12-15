@@ -6,7 +6,7 @@ export interface Campaign extends RowDataPacket {
   status: "ENABLED" | "PAUSED" | "REMOVED";
   channelType: "SEARCH" | "DISPLAY" | "VIDEO" | "SHOPPING" | "PERFORMANCE_MAX";
   budget: number;
-  googleCampaignId?: number | null;
+  googleCampaignId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,6 +16,7 @@ export interface CreateCampaignDB {
   status: Campaign["status"];
   channelType: Campaign["channelType"];
   budget: number;
+  googleCampaignId?: string | null;
 }
 
 export interface CreateCampaignDTO {

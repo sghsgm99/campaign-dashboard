@@ -206,7 +206,7 @@ export class GoogleAdsService {
         exact: exactKeywords,
       },
     };
-  }  
+  }
 
   async createAdGroups(adGroups: any[]) {
     try {
