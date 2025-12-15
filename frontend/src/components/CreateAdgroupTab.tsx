@@ -144,7 +144,7 @@ const CreateAdgroupTab = ({
                 >
                   <option value="">Select Campaign</option>
                   {campaignList.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.google_campaign_id} value={c.google_campaign_id}>{c.name}</option>
                   ))}
                 </select>
 

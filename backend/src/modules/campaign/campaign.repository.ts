@@ -10,6 +10,7 @@ export class CampaignRepository {
         name,
         status,
         budget,
+        google_campaign_id,
         channel_type AS channelType,
         created_at AS createdAt
       FROM campaigns
