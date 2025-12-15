@@ -11,7 +11,7 @@ export interface AdGroup extends RowDataPacket {
     | "SHOPPING_STANDARD"
     | "VIDEO_TRUEVIEW";
   cpcBid: number | null;
-  googleAdgroupId?: string | null;
+  googleAdGroupId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -22,7 +22,7 @@ export interface CreateAdGroupDB {
   status: AdGroup["status"];
   type: AdGroup["type"];
   cpcBid?: number | null;
-  googleAdgroupId?: string | null;
+  googleAdGroupId?: string | null;
 }
 
 export interface CreateAdGroupDTO {

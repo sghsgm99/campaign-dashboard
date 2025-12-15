@@ -11,7 +11,7 @@ export class AdGroupService {
 
   async create(payload: CreateAdGroupDTO[]) {
     const result = await this.googleAds.createAdGroups(payload);
-  
+
     for (let i = 0; i < payload.length; i++) {
       const item = payload[i];
   

@@ -26,7 +26,7 @@ export class AdGroupRepository {
       INSERT INTO adgroups (campaign_id, name, cpc_bid, google_adgroup_id)
       VALUES (?, ?, ?, ?)
       `,
-      [data.campaignId, data.name, data.cpcBid, data.googleAdgroupId]
+      [data.campaignId, data.name, data.cpcBid, data.googleAdGroupId]
     );
 
     return result.insertId;
