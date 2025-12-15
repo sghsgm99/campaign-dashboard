@@ -42,3 +42,7 @@ export interface CreateAdGroupDTO {
     exact: string[];
   };
 }
+
+export interface CreateAdGroupRequest {
+  adGroups: CreateAdGroupDTO[];
+}
