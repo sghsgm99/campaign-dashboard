@@ -27,11 +27,11 @@ const OverviewTab = ({ campaigns }: OverviewTabProps) => {
               </div>
               <div className="grid grid-cols-4 gap-8 text-right">
                 <div>
-                  <div className="text-sm font-medium text-gray-900">{c.impressions.toLocaleString()}</div>
+                  <div className="text-sm font-medium text-gray-900">{(c.impressions ?? 0).toLocaleString()}</div>
                   <div className="text-xs text-gray-600">Impressions</div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-gray-900">{c.clicks.toLocaleString()}</div>
+                  <div className="text-sm font-medium text-gray-900">{(c.clicks ?? 0).toLocaleString()}</div>
                   <div className="text-xs text-gray-600">Clicks</div>
                 </div>
                 <div>
@@ -39,7 +39,7 @@ const OverviewTab = ({ campaigns }: OverviewTabProps) => {
                   <div className="text-xs text-gray-600">CTR</div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-gray-900">${c.cost.toFixed(2)}</div>
+                  <div className="text-sm font-medium text-gray-900">${(c.cost ?? 0).toFixed(2)}</div>
                   <div className="text-xs text-gray-600">Spent</div>
                 </div>
               </div>
