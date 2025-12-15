@@ -10,24 +10,31 @@ export class AdGroupService {
   }
 
   async create(payload: CreateAdGroupDTO[]) {
-    //const result = await this.googleAds.createAdGroups(payload);
-
-    const result: { campaignId: number; name: string; status: "PAUSED" }[] = [];
-
-    for (const item of payload) {
+    const result = await this.googleAds.createAdGroups(payload);
+  
+    for (let i = 0; i < payload.length; i++) {
+      const item = payload[i];
+  
+      const adGroupResource = result?.adGroups[i];
+      const adGroupId = adGroupResource ? adGroupResource.split('/').pop() : null;
+  
+      if (!adGroupId) {
+        throw new Error("Failed to extract adGroupId from result.");
+      }
+  
       const adGroupData = {
         campaignId: item.campaignId,
         name: item.name,
         status: "PAUSED" as "PAUSED",
         cpcBid: item.cpcBid,
         type: "SEARCH_STANDARD" as "SEARCH_STANDARD",
+        googleAdGroupId: adGroupId,
       };
   
       await AdGroupRepository.save(adGroupData);
-  
-      result.push({ campaignId: item.campaignId, name: item.name, status: "PAUSED" });
     }
-
+  
     return result;
   }
+  
 }

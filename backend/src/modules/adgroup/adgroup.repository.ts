@@ -23,10 +23,10 @@ export class AdGroupRepository {
   static async save(data: CreateAdGroupDB) {
     const [result] = await db.query<ResultSetHeader>(
       `
-      INSERT INTO adgroups (campaign_id, name, cpc_bid)
-      VALUES (?, ?, ?)
+      INSERT INTO adgroups (campaign_id, name, cpc_bid, google_adgroup_id)
+      VALUES (?, ?, ?, ?)
       `,
-      [data.campaignId, data.name, data.cpcBid]
+      [data.campaignId, data.name, data.cpcBid, data.googleAdgroupId]
     );
 
     return result.insertId;
