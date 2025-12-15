@@ -9,6 +9,7 @@ export class AdGroupRepository {
       SELECT
         id,
         name,
+        google_adgroup_id,
         created_at AS createdAt
       FROM adgroups
       WHERE campaign_id = ?
@@ -24,9 +25,14 @@ export class AdGroupRepository {
     const [result] = await db.query<ResultSetHeader>(
       `
       INSERT INTO adgroups (campaign_id, name, cpc_bid, google_adgroup_id)
-      VALUES (?, ?, ?, ?)
+      VALUES (
+        (SELECT id FROM campaigns WHERE google_campaign_id = ?),
+        ?, 
+        ?, 
+        ?
+      )
       `,
-      [data.campaignId, data.name, data.cpcBid, data.googleAdGroupId]
+      [data.googleCampaignId, data.name, data.cpcBid, data.googleAdGroupId]
     );
 
     return result.insertId;

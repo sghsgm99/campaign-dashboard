@@ -17,7 +17,7 @@ export interface AdGroup extends RowDataPacket {
 }
 
 export interface CreateAdGroupDB {
-  campaignId: number;
+  googleCampaignId: number;
   name: string;
   status: AdGroup["status"];
   type: AdGroup["type"];
@@ -28,7 +28,7 @@ export interface CreateAdGroupDB {
 export interface CreateAdGroupDTO {
   campaignId: number;
   name: string;
-  cpcBid: number;  
+  cpcBid: number;
   status: AdGroup["status"];
   type: AdGroup["type"];
   keywords: {

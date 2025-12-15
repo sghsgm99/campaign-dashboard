@@ -6,26 +6,28 @@ export class AdService {
   private googleAds = new GoogleAdsService();
 
   async create(payload: CreateAdDTO[]) {
-    //const result = await this.googleAds.createAds(payload);
+    const result = await this.googleAds.createAds(payload);
 
-    const result: { adgroupId: number; status: "PAUSED" }[] = [];
-
-    for (const item of payload) {
-      if (!item.headlines?.length) {
-        throw new Error("At least one headline is required");
+    for (let i = 0; i < payload.length; i++) {
+      const item = payload[i];
+  
+      const adResource = result?.ads[i];
+      const adId = adResource ? adResource.split('/').pop() : null;
+  
+      if (!adId) {
+        throw new Error("Failed to extract adId from result.");
       }
-      
-      const adData = {
+  
+      const adGroupData = {
         adGroupId: item.adGroupId,
         headlines: item.headlines, 
         descriptions: item.descriptions ?? [],  
         finalUrl: item.finalUrl,
         status: "PAUSED" as "PAUSED",
+        googleAdId: adId
       };
   
-      await AdRepository.save(adData);
-  
-      result.push({ adgroupId: item.adGroupId, status: "PAUSED" });
+      await AdRepository.save(adGroupData);
     }
 
     return result;

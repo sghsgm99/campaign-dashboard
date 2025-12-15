@@ -23,7 +23,7 @@ export class AdGroupService {
       }
   
       const adGroupData = {
-        campaignId: item.campaignId,
+        googleCampaignId: item.campaignId,
         name: item.name,
         status: "PAUSED" as "PAUSED",
         cpcBid: item.cpcBid,

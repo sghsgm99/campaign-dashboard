@@ -400,19 +400,18 @@ export class GoogleAdsService {
       );
   
       const response = await this.customer.mutateResources(adOperations);
+
+      const createdAdResources = response.mutate_operation_responses
+        .map((r: any) => r?.ad_group_ad_result?.resource_name)
+        .filter(Boolean);
   
       return {
-        success: true,
-        result: response.mutate_operation_responses?.map((r: any) => ({
-          resource: r.ad_group_ad_result?.resource_name,
-        })),
+        message: "Ads created successfully",
+        ads: createdAdResources,
       };
-    } catch (error: any) {
-      console.error("Ad creation failed:", error);
-      return {
-        success: false,
-        message: error.message || "Error creating ads",
-      };
+    } catch (err: any) {
+      console.error("Bulk A Creation Error:", err);
+      throw new Error(err.message || "Failed to create ads");
     }
   }  
 
