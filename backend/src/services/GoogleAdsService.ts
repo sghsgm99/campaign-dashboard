@@ -226,7 +226,7 @@ export class GoogleAdsService {
             campaign: campaignResource,
             status: enums.AdGroupStatus.ENABLED,
             type: enums.AdGroupType.SEARCH_STANDARD,
-            cpc_bid_micros: Math.round(g.defaultBid * 1_000_000),
+            cpc_bid_micros: Math.round(g.cpcBid * 1_000_000),
           },
         };
       });

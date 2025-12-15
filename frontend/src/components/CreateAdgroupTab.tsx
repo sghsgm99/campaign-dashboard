@@ -11,7 +11,7 @@ interface CreateAdgroupTabProps {
 const EMPTY_ADGROUP = {
   campaignId: "",
   adgroupName: "",
-  defaultBid: "",
+  cpcBid: "",
   keywords: {
     broad: "",
     phrase: "",
@@ -83,7 +83,7 @@ const CreateAdgroupTab = ({
     const payload = adGroups.map(g => ({
       campaignId: g.campaignId,
       name: g.adgroupName,
-      defaultBid: parseFloat(g.defaultBid) || 0,
+      cpcBid: parseFloat(g.cpcBid) || 0,
     
       keywords: {
         broad: g.keywords.broad.split("\n").map(k => k.trim()).filter(Boolean),
@@ -162,8 +162,8 @@ const CreateAdgroupTab = ({
                   type="number"
                   placeholder="Default Bid"
                   className="px-4 py-2 border rounded-lg"
-                  value={g.defaultBid}
-                  onChange={e => updateAdGroup(index, "defaultBid", e.target.value)}
+                  value={g.cpcBid}
+                  onChange={e => updateAdGroup(index, "cpcBid", e.target.value)}
                 />
               </div>
 

@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
 
-import campaignRoutes from "./routes/campaignRoutes";
-import adgroupRoutes from "./routes/adgroupRoutes";
-import adRoutes from "./routes/adRoutes";
+import campaignRoutes from "./modules/campaign/campaign.routes";
+import adgroupRoutes from "./modules/adgroup/adgroup.routes";
+import adRoutes from "./modules/ad/ad.routes";
 
 const app = express();
 

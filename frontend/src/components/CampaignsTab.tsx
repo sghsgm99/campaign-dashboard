@@ -6,10 +6,10 @@ interface Campaign {
   name: string;
   status: string;
   budget: number;
-  impressions: number;
-  clicks: number;
-  ctr: number;
-  cost: number;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+  cost?: number;
 }
 
 interface CampaignsTabProps {
@@ -73,10 +73,16 @@ const CampaignsTab = ({ campaigns }: CampaignsTabProps) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right">${campaign.budget}</td>
-                <td className="px-6 py-4 text-right">{campaign.impressions.toLocaleString()}</td>
-                <td className="px-6 py-4 text-right">{campaign.clicks.toLocaleString()}</td>
-                <td className="px-6 py-4 text-right">{campaign.ctr}%</td>
-                <td className="px-6 py-4 text-right">${campaign.cost.toFixed(2)}</td>
+                <td className="px-6 py-4 text-right">
+                  {(campaign.impressions ?? 0).toLocaleString()}
+                </td>
+                <td className="px-6 py-4 text-right">
+                  {(campaign.clicks ?? 0).toLocaleString()}
+                </td>
+                <td className="px-6 py-4 text-right">
+                  {((campaign.ctr ?? 0) || 0).toFixed(2)}%
+                </td>
+                <td className="px-6 py-4 text-right">${(campaign.cost ?? 0).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

@@ -5,8 +5,8 @@ import { CreateAdGroupDTO } from "./adgroup.types";
 export class AdGroupService {
   private googleAds = new GoogleAdsService();
 
-  async getAll() {
-    return AdGroupRepository.findAll();
+  async getAdGroups(campaignId: string) {
+    return AdGroupRepository.findAll(campaignId);
   }
 
   async create(payload: CreateAdGroupDTO[]) {

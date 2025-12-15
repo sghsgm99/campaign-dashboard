@@ -6,7 +6,7 @@ const router = Router();
 const service = new AdGroupService();
 const controller = new AdGroupController(service);
 
-router.get("/", controller.getAll);
 router.post("/", controller.create);
+router.get("/:campaignId", controller.getByCampaignId);
 
 export default router;

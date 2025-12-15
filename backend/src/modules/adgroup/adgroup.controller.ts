@@ -5,9 +5,11 @@ import { CreateAdGroupRequest } from "./adgroup.types";
 export class AdGroupController {
   constructor(private readonly service: AdGroupService) {}
 
-  getAll = async (_req: Request, res: Response) => {
+  getByCampaignId = async (_req: Request, res: Response) => {
     try {
-      const adgroups = await this.service.getAll();
+      const { campaignId } = _req.params;
+
+      const adgroups = await this.service.getAdGroups(campaignId);
       res.json(adgroups);
     } catch (error) {
       console.error(error);

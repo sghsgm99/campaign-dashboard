@@ -3,15 +3,19 @@ import { AdGroup, CreateAdGroupDB } from "./adgroup.types";
 import { ResultSetHeader } from "mysql2";
 
 export class AdGroupRepository {
-  static async findAll(): Promise<AdGroup[]> {
-    const [rows] = await db.query<AdGroup[]>(`
+  static async findAll(campaignId: string): Promise<AdGroup[]> {
+    const [rows] = await db.query<AdGroup[]>(
+      `
       SELECT
         id,
-        name
+        name,
         created_at AS createdAt
       FROM adgroups
+      WHERE campaign_id = ?
       ORDER BY created_at DESC
-    `);
+      `,
+      [campaignId]
+    );
 
     return rows;
   }
