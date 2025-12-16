@@ -9,6 +9,7 @@ import CreateAdgroupTab from './components/CreateAdgroupTab';
 import CreateAdTab from './components/CreateAdTab';
 import CreateNegativeKeywordTab from './components/CreateNegativeKeywordTab';
 import { Tabs, type TabType } from "./constants/tabs";
+import AdgroupsTab from './components/AdgroupsTab';
 
 type CreationStatus = {
   type: 'success' | 'error';
@@ -18,6 +19,7 @@ type CreationStatus = {
 const GoogleAdsDashboard = () => {
   const [activeTab, setActiveTab] = useState<TabType>(Tabs.CREATE_CAMPAIGN);
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [adgroups, setAdgroups] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     campaignName: '',
     campaignType: 'SEARCH',
@@ -29,6 +31,7 @@ const GoogleAdsDashboard = () => {
 
   useEffect(() => {
     loadCampaigns();
+    loadAdgroups();
   }, []);
 
   const loadCampaigns = async () => {
@@ -37,6 +40,15 @@ const GoogleAdsDashboard = () => {
       setCampaigns(data);
     } catch (err) {
       console.error('Error loading campaigns:', err);
+    }
+  };
+
+  const loadAdgroups = async () => {
+    try {
+      const data = await api.getAdgroups();
+      setAdgroups(data);
+    } catch (err) {
+      console.error('Error loading adgroups:', err);
     }
   };
 
@@ -200,6 +212,7 @@ const GoogleAdsDashboard = () => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {activeTab === Tabs.OVERVIEW && <OverviewTab campaigns={campaigns} />}
         {activeTab === Tabs.CAMPAIGNS && <CampaignsTab campaigns={campaigns} />}
+        {activeTab === Tabs.ADGROUPS && <AdgroupsTab adgroups={adgroups} />}
         {activeTab === Tabs.CREATE_CAMPAIGN && (
           <CreateCampaignTab
             formData={formData}

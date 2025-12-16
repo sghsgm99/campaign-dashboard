@@ -6,6 +6,10 @@ import { KeywordRepository } from "../keyword/keyword.repository";
 export class AdGroupService {
   private googleAds = new GoogleAdsService();
 
+  async getAll() {
+    return AdGroupRepository.getAll();
+  }
+
   async getAdGroups(campaignId: string) {
     return AdGroupRepository.findAll(campaignId);
   }

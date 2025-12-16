@@ -2,8 +2,8 @@ import { RowDataPacket } from "mysql2";
 
 export interface AdGroup extends RowDataPacket {
   id: number;
-  campaignId: number;
   name: string;
+  campaignName: string;
   status: "ENABLED" | "PAUSED" | "REMOVED";
   type:
     | "SEARCH_STANDARD"

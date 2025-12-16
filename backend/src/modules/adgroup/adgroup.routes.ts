@@ -8,5 +8,6 @@ const controller = new AdGroupController(service);
 
 router.post("/", controller.create);
 router.get("/:campaignId", controller.getByCampaignId);
+router.get("/", controller.getAll);
 
 export default router;

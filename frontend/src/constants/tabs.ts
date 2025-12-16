@@ -1,6 +1,7 @@
 export enum Tabs {
   OVERVIEW = "overview",
   CAMPAIGNS = "campaigns",
+  ADGROUPS = "adgroups",
   CREATE_CAMPAIGN = "create_campaign",
   CREATE_ADGROUP = "create_adgroup",
   CREATE_AD = "create_ad",

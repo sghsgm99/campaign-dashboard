@@ -8,6 +8,11 @@ export const api = {
     return response.data;
   },
 
+  getAdgroups: async () => {
+    const response = await axios.get(`${API_BASE_URL}/adgroups`);
+    return response.data;
+  },
+
   getAdGroupsByCampaign: async (campaignId: string) => {
     const response = await axios.get(`${API_BASE_URL}/adgroups/${campaignId}`);
     return response.data;
