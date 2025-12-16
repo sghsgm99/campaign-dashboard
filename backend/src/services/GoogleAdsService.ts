@@ -350,12 +350,18 @@ export class GoogleAdsService {
       //----------------------------------------------------
       // 4. EXECUTE KEYWORD CREATION IN ONE BULK CALL
       //----------------------------------------------------
+      let createdKeywordResources: any[] = [];
+
       if (keywordOperations.length > 0) {
         const kwResult = await this.customer.mutateResources(keywordOperations);
   
         if (!kwResult.mutate_operation_responses?.length) {
           throw new Error("Keyword creation failed.");
         }
+
+        createdKeywordResources = kwResult.mutate_operation_responses
+        .map((r: any) => r?.ad_group_criterion_result?.resource_name)
+        .filter(Boolean);
       }
   
       //----------------------------------------------------
@@ -364,13 +370,14 @@ export class GoogleAdsService {
       return {
         message: "Ad groups and keywords created successfully",
         adGroups: createdAdGroupResources,
+        keywords: createdKeywordResources, //customers/6132954200/adGroupCriteria/191808445602~22856300
       };
   
     } catch (err: any) {
       console.error("Bulk AdGroup Creation Error:", err);
       throw new Error(err.message || "Failed to create ad groups");
     }
-  }  
+  }
 
   async createAds(ads: any[]) {
     try {

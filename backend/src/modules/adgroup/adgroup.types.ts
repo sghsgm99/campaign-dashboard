@@ -23,6 +23,11 @@ export interface CreateAdGroupDB {
   type: AdGroup["type"];
   cpcBid?: number | null;
   googleAdGroupId?: string | null;
+  keywords: {
+    broad: string[];
+    phrase: string[];
+    exact: string[];
+  };
 }
 
 export interface CreateAdGroupDTO {

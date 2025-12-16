@@ -1,6 +1,7 @@
 import { GoogleAdsService } from "../../services/GoogleAdsService";
 import { AdGroupRepository } from "./adgroup.repository";
 import { CreateAdGroupDTO } from "./adgroup.types";
+import { KeywordRepository } from "../keyword/keyword.repository";
 
 export class AdGroupService {
   private googleAds = new GoogleAdsService();
@@ -29,12 +30,19 @@ export class AdGroupService {
         cpcBid: item.cpcBid,
         type: "SEARCH_STANDARD" as "SEARCH_STANDARD",
         googleAdGroupId: adGroupId,
+        keywords: item.keywords
       };
   
-      await AdGroupRepository.save(adGroupData);
+      const adGroupIdFromDB = await AdGroupRepository.save(adGroupData);
+
+      await KeywordRepository.save({
+        adGroupId: adGroupIdFromDB,
+        broad: JSON.stringify(item.keywords.broad),
+        phrase: JSON.stringify(item.keywords.phrase),
+        exact: JSON.stringify(item.keywords.exact),
+      });
     }
   
     return result;
   }
-  
 }
