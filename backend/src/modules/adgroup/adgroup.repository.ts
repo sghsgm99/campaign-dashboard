@@ -3,20 +3,21 @@ import { AdGroup, CreateAdGroupDB } from "./adgroup.types";
 import { ResultSetHeader } from "mysql2";
 
 export class AdGroupRepository {
-  static async findAll(campaignId: string): Promise<AdGroup[]> {
-    const [rows] = await db.query<AdGroup[]>(
-      `
+  static async findAll(googleCampaignId: string): Promise<AdGroup[]> {
+    const sql = `
       SELECT
-        id,
-        name,
-        google_adgroup_id,
-        created_at AS createdAt
-      FROM adgroups
-      WHERE campaign_id = ?
-      ORDER BY created_at DESC
-      `,
-      [campaignId]
-    );
+        ag.id,
+        ag.name,
+        ag.google_adgroup_id,
+        ag.created_at AS createdAt
+      FROM adgroups ag
+      INNER JOIN campaigns c
+        ON c.id = ag.campaign_id
+      WHERE c.google_campaign_id = ?
+      ORDER BY ag.created_at DESC
+    `;
+
+    const [rows] = await db.query<AdGroup[]>(sql, [googleCampaignId]);
 
     return rows;
   }

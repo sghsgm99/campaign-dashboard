@@ -271,21 +271,7 @@ export class GoogleAdsService {
             },
           });
         });
-        group.negativeKeywords.broad.forEach((kw: string) => {
-          keywordOperations.push({
-            entity: "ad_group_criterion",
-            operation: "create",
-            resource: {
-              ad_group: adGroupResource,
-              negative: true,
-              keyword: {
-                text: kw,
-                match_type: enums.KeywordMatchType.BROAD,
-              },
-            },
-          });
-        });
-  
+
         // Add Phrase match keywords
         group.keywords.phrase.forEach((kw: string) => {
           keywordOperations.push({
@@ -301,21 +287,7 @@ export class GoogleAdsService {
             },
           });
         });
-        group.negativeKeywords.phrase.forEach((kw: string) => {
-          keywordOperations.push({
-            entity: "ad_group_criterion",
-            operation: "create",
-            resource: {
-              ad_group: adGroupResource,
-              negative: true,
-              keyword: {
-                text: kw,
-                match_type: enums.KeywordMatchType.PHRASE,
-              },
-            },
-          });
-        });
-  
+        
         // Add Exact match keywords
         group.keywords.exact.forEach((kw: string) => {
           keywordOperations.push({
@@ -324,20 +296,6 @@ export class GoogleAdsService {
             resource: {
               ad_group: adGroupResource,
               status: enums.AdGroupCriterionStatus.ENABLED,
-              keyword: {
-                text: kw,
-                match_type: enums.KeywordMatchType.EXACT,
-              },
-            },
-          });
-        });
-        group.negativeKeywords.exact.forEach((kw: string) => {
-          keywordOperations.push({
-            entity: "ad_group_criterion",
-            operation: "create",
-            resource: {
-              ad_group: adGroupResource,
-              negative: true,
               keyword: {
                 text: kw,
                 match_type: enums.KeywordMatchType.EXACT,
@@ -420,6 +378,104 @@ export class GoogleAdsService {
       console.error("Bulk A Creation Error:", err);
       throw new Error(err.message || "Failed to create ads");
     }
-  }  
+  }
+
+  async createNegativeKeywords(payloads: any[]) {
+    const customerId = this.customer.credentials.customer_id;
+  
+    //--------------------------------------------------
+    // Build ALL Negative Keyword Operations
+    //--------------------------------------------------
+    const operations: MutateOperation<
+      resources.ICampaignCriterion | resources.IAdGroupCriterion
+    >[] = [];
+  
+    const buildOps = (
+      level: 1 | 2,
+      resourceName: string,
+      keywords: string[],
+      matchType: enums.KeywordMatchType
+    ) => {
+      keywords.forEach(kw => {
+        operations.push({
+          entity: level === 1
+            ? "campaign_criterion"
+            : "ad_group_criterion",
+          operation: "create",
+          resource: {
+            ...(level === 1
+              ? { campaign: resourceName }
+              : { ad_group: resourceName }),
+            negative: true,
+            keyword: {
+              text: kw,
+              match_type: matchType,
+            },
+          },
+        });
+      });
+    };
+  
+    payloads.forEach(item => {
+      const campaignResource = `customers/${customerId}/campaigns/${item.campaignId}`;
+  
+      const adGroupResource =
+        item.level === 2 && item.adGroupId
+          ? `customers/${customerId}/adGroups/${item.adGroupId}`
+          : null;
+  
+      if (item.level === 2 && !adGroupResource) {
+        throw new Error("AdGroup level requires adGroupId");
+      }
+  
+      buildOps(
+        item.level,
+        item.level === 1 ? campaignResource : adGroupResource!,
+        item.negativeKeywords.broad,
+        enums.KeywordMatchType.BROAD
+      );
+  
+      buildOps(
+        item.level,
+        item.level === 1 ? campaignResource : adGroupResource!,
+        item.negativeKeywords.phrase,
+        enums.KeywordMatchType.PHRASE
+      );
+  
+      buildOps(
+        item.level,
+        item.level === 1 ? campaignResource : adGroupResource!,
+        item.negativeKeywords.exact,
+        enums.KeywordMatchType.EXACT
+      );
+    });
+  
+    //--------------------------------------------------
+    // Execute Bulk Mutation
+    //--------------------------------------------------
+    let createdResources: string[] = [];
+  
+    if (operations.length > 0) {
+      const result = await this.customer.mutateResources(operations);
+  
+      createdResources =
+        result.mutate_operation_responses
+          ?.map((r: any) =>
+            r.campaign_criterion_result?.resource_name ||
+            r.ad_group_criterion_result?.resource_name
+          )
+          .filter(Boolean) || [];
+    }
+  
+    //--------------------------------------------------
+    // Result
+    //--------------------------------------------------
+    return {
+      totalItems: payloads.length,
+      totalKeywordsCreated: createdResources.length,
+      resources: createdResources,
+    };
+  }
+  
 
 }

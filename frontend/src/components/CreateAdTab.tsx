@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AlertCircle, CheckCircle2, Plus } from "lucide-react";
+import { AdGroup } from "../types/adgroup";
 
 interface CreateAdTabProps {
   creationStatus: { type: "success" | "error"; message: string } | null;
@@ -7,12 +8,6 @@ interface CreateAdTabProps {
   handleCreateAd: (ads: any[]) => void;
   campaignList: any[];
   loadAdGroups: (campaignId: string) => Promise<AdGroup[]>;
-}
-
-interface AdGroup {
-  id: string;
-  name: string;
-  google_adgroup_id: string;
 }
 
 const createEmptyAd = () => ({
@@ -136,7 +131,7 @@ const CreateAdTab = ({
               >
                 <option value="">Select Campaign</option>
                 {campaignList.map(c => (
-                  <option key={c.id} value={c.id}>
+                  <option key={c.google_campaign_id} value={c.google_campaign_id}>
                     {c.name}
                   </option>
                 ))}

@@ -6,9 +6,6 @@ interface CreateCampaignTabProps {
     campaignType: string;
     dailyBudget: string;
     targetLocation: string;
-    broadKeywords: string;
-    phraseKeywords: string;
-    exactKeywords: string;
   };
   creationStatus: { type: 'success' | 'error'; message: string } | null;
   isCreating: boolean;
@@ -91,40 +88,6 @@ const CreateCampaignTab = ({
               placeholder="Target Location"
               className="w-full px-4 py-2 border rounded-lg"
             />
-          </div>
-
-          {/* Negative Keywords */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Negative Keywords</h3>
-
-            <div className="grid grid-cols-3 gap-4">
-              <textarea
-                name="broadKeywords"
-                value={formData.broadKeywords}
-                onChange={handleInputChange}
-                rows={4}
-                placeholder="Broad Match Keywords&#10;keyword1&#10;keyword2"
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-
-              <textarea
-                name="phraseKeywords"
-                value={formData.phraseKeywords}
-                onChange={handleInputChange}
-                rows={4}
-                placeholder="Phrase Match Keywords&#10;keyword1&#10;keyword2"
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-
-              <textarea
-                name="exactKeywords"
-                value={formData.exactKeywords}
-                onChange={handleInputChange}
-                rows={4}
-                placeholder="Exact Match Keywords&#10;keyword1&#10;keyword2"
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
           </div>
 
           {/* Buttons */}

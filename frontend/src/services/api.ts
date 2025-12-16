@@ -37,4 +37,9 @@ export const api = {
     const response = await axios.post(`${API_BASE_URL}/ads`, adData);
     return response.data;
   },
+
+  createNegativeKeyword: async (negativeKeywordData: any) => {
+    const response = await axios.post(`${API_BASE_URL}/negativekeywords`, negativeKeywordData);
+    return response.data;
+  },
 };

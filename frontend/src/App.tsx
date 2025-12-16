@@ -7,6 +7,7 @@ import CampaignsTab from './components/CampaignsTab';
 import CreateCampaignTab from './components/CreateCampaignTab';
 import CreateAdgroupTab from './components/CreateAdgroupTab';
 import CreateAdTab from './components/CreateAdTab';
+import CreateNegativeKeywordTab from './components/CreateNegativeKeywordTab';
 import { Tabs, type TabType } from "./constants/tabs";
 
 type CreationStatus = {
@@ -21,10 +22,7 @@ const GoogleAdsDashboard = () => {
     campaignName: '',
     campaignType: 'SEARCH',
     dailyBudget: '',
-    targetLocation: '',
-    broadKeywords: '',
-    phraseKeywords: '',
-    exactKeywords: ''
+    targetLocation: ''
   });
   const [isCreating, setIsCreating] = useState(false);
   const [creationStatus, setCreationStatus] = useState<CreationStatus | null>(null);
@@ -62,9 +60,6 @@ const GoogleAdsDashboard = () => {
         type: formData.campaignType,
         budget: parseFloat(formData.dailyBudget),
         location: formData.targetLocation,
-        broadKeywords: formData.broadKeywords.split("\n").map(k => k.trim()).filter(k => k),
-        phraseKeywords: formData.phraseKeywords.split("\n").map(k => k.trim()).filter(k => k),
-        exactKeywords: formData.exactKeywords.split("\n").map(k => k.trim()).filter(k => k),
       };
 
       await api.createCampaign(payload);
@@ -77,9 +72,6 @@ const GoogleAdsDashboard = () => {
         campaignType: 'SEARCH',
         dailyBudget: '',
         targetLocation: '',
-        broadKeywords: '',
-        phraseKeywords: '',
-        exactKeywords: '',
       });
 
       setTimeout(() => {
@@ -149,6 +141,32 @@ const GoogleAdsDashboard = () => {
     setIsCreating(false);
   };
 
+  const handleCreateNegativeKeyword = async (negativeKeywordsPayload: any[]) => {
+    setIsCreating(true);
+    setCreationStatus(null);
+  
+    try {
+      await api.createNegativeKeyword({ negativeKeywords: negativeKeywordsPayload });
+  
+      setCreationStatus({ type: "success", message: "Negative Kewyords created successfully!" });
+  
+      await loadCampaigns();
+  
+      setTimeout(() => {
+        setActiveTab(Tabs.CAMPAIGNS);
+        setCreationStatus(null);
+      }, 1500);
+    } catch (error: any) {
+      console.error("API Error:", error);
+      setCreationStatus({
+        type: "error",
+        message: error?.response?.data?.message || "Failed to create Negative Kewyords",
+      });
+    }
+  
+    setIsCreating(false);
+  };
+
   const loadAdGroups = async (campaignId: string) => {
     try {
       const data = await api.getAdGroupsByCampaign(campaignId);
@@ -205,7 +223,16 @@ const GoogleAdsDashboard = () => {
             isCreating={isCreating}
             handleCreateAd={handleCreateAd}
             campaignList={campaigns}
-            loadAdGroups={loadAdGroups}  // NEW
+            loadAdGroups={loadAdGroups}
+          />
+        )}
+        {activeTab === Tabs.CREATE_NEGATIVE_KEYWORD && (
+          <CreateNegativeKeywordTab
+            creationStatus={creationStatus}
+            isCreating={isCreating}
+            handleCreateNegativeKeyword={handleCreateNegativeKeyword}
+            campaignList={campaigns}
+            loadAdGroups={loadAdGroups}
           />
         )}
       </div>
