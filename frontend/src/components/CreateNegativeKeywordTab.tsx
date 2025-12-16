@@ -98,7 +98,7 @@ const CreateNegativeKeywordTab = ({
       <div className="bg-white rounded-lg shadow-sm border p-8">
 
         <h2 className="text-2xl font-bold mb-6">
-          Create Negative Keywords
+          Create Multiple Negative Keywords
         </h2>
 
         {/* Status */}
