@@ -19,6 +19,9 @@ const createEmptyAd = () => ({
   adGroups: [] as AdGroup[],
 });
 
+const MAX_HEADLINES = 15;
+const MAX_DESCRIPTIONS = 4;
+
 const CreateAdTab = ({
   creationStatus,
   isCreating,
@@ -88,9 +91,26 @@ const CreateAdTab = ({
     handleCreateAd(payload);
   };
 
-  // -----------------------------------
-  // UI Rendering
-  // -----------------------------------
+  const addHeadline = (adIndex: number) => {
+    setAds(prev =>
+      prev.map((ad, i) =>
+        i === adIndex && ad.headlines.length < MAX_HEADLINES
+          ? { ...ad, headlines: [...ad.headlines, ""] }
+          : ad
+      )
+    );
+  };  
+  
+  const addDescription = (adIndex: number) => {
+    setAds(prev =>
+      prev.map((ad, i) =>
+        i === adIndex && ad.descriptions.length < MAX_DESCRIPTIONS
+          ? { ...ad, descriptions: [...ad.descriptions, ""] }
+          : ad
+      )
+    );
+  };  
+  
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -165,57 +185,109 @@ const CreateAdTab = ({
               onChange={e => updateField(index, "finalUrl", e.target.value)}
             />
 
-            {/* Headlines */}
-            <div className="space-y-3 mb-6">
-              <p className="font-semibold">Headlines</p>
-              {ad.headlines.map((h, hIndex) => {
-                const count = h.length;
-                return (
-                  <div key={hIndex}>
-                    <input
-                      type="text"
-                      className={`w-full px-4 py-2 border rounded-lg ${
-                        count > 30 ? "border-red-500" : ""
-                      }`}
-                      placeholder={`Headline ${hIndex + 1}`}
-                      value={h}
-                      onChange={e =>
-                        updateHeadline(index, hIndex, e.target.value)
-                      }
-                    />
-                    <p className={`text-sm text-right ${count > 30 ? "text-red-600" : "text-gray-500"}`}>
-                      {count}/30
-                    </p>
-                  </div>
-                );
-              })}
+            {/* Headlines + Descriptions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+              {/* Headlines */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="font-semibold">
+                    Headlines ({ad.headlines.length}/{MAX_HEADLINES})
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {ad.headlines.map((h, hIndex) => {
+                    const count = h.length;
+
+                    return (
+                      <div key={hIndex}>
+                        <input
+                          type="text"
+                          className={`w-full px-4 py-2 border rounded-lg ${
+                            count > 30 ? "border-red-500" : ""
+                          }`}
+                          placeholder={`Headline ${hIndex + 1}`}
+                          value={h}
+                          onChange={e =>
+                            updateHeadline(index, hIndex, e.target.value)
+                          }
+                        />
+                        <p
+                          className={`text-sm text-right ${
+                            count > 30 ? "text-red-600" : "text-gray-500"
+                          }`}
+                        >
+                          {count}/30
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Add Headline */}
+                <button
+                  type="button"
+                  onClick={() => addHeadline(index)}
+                  disabled={ad.headlines.length >= MAX_HEADLINES}
+                  className="mt-3 text-sm text-blue-600 disabled:text-gray-400"
+                >
+                  + Add Headline
+                </button>
+              </div>
+
+
+              {/* Descriptions */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="font-semibold">
+                    Descriptions ({ad.descriptions.length}/{MAX_DESCRIPTIONS})
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {ad.descriptions.map((d, dIndex) => {
+                    const count = d.length;
+
+                    return (
+                      <div key={dIndex}>
+                        <textarea
+                          rows={2}
+                          className={`w-full px-4 py-2 border rounded-lg ${
+                            count > 90 ? "border-red-500" : ""
+                          }`}
+                          placeholder={`Description ${dIndex + 1}`}
+                          value={d}
+                          onChange={e =>
+                            updateDescription(index, dIndex, e.target.value)
+                          }
+                        />
+                        <p
+                          className={`text-sm text-right ${
+                            count > 90 ? "text-red-600" : "text-gray-500"
+                          }`}
+                        >
+                          {count}/90
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Add Description */}
+                <button
+                  type="button"
+                  onClick={() => addDescription(index)}
+                  disabled={ad.descriptions.length >= MAX_DESCRIPTIONS}
+                  className="mt-3 text-sm text-blue-600 disabled:text-gray-400"
+                >
+                  + Add Description
+                </button>
+              </div>
+
+
             </div>
 
-            {/* Descriptions */}
-            <div className="space-y-3">
-              <p className="font-semibold">Descriptions</p>
-              {ad.descriptions.map((d, dIndex) => {
-                const count = d.length;
-                return (
-                  <div key={dIndex}>
-                    <textarea
-                      rows={2}
-                      className={`w-full px-4 py-2 border rounded-lg ${
-                        count > 90 ? "border-red-500" : ""
-                      }`}
-                      placeholder={`Description ${dIndex + 1}`}
-                      value={d}
-                      onChange={e =>
-                        updateDescription(index, dIndex, e.target.value)
-                      }
-                    />
-                    <p className={`text-sm text-right ${count > 90 ? "text-red-600" : "text-gray-500"}`}>
-                      {count}/90
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         ))}
 
