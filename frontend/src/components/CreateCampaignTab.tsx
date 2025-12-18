@@ -60,24 +60,30 @@ const CreateCampaignTab = ({
                 value={formData.campaignType}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border rounded-lg"
+                disabled
               >
                 <option value="SEARCH">Search</option>
-                <option value="DISPLAY" disabled>
+                <option value="DISPLAY">
                   Display
                 </option>
-                <option value="VIDEO" disabled>
+                <option value="VIDEO">
                   Video
                 </option>
               </select>
 
-              <input
-                type="number"
-                name="dailyBudget"
-                value={formData.dailyBudget}
-                onChange={handleInputChange}
-                placeholder="Daily Budget"
-                className="w-full px-4 py-2 border rounded-lg"
-              />
+              <div className="relative w-full">
+                <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 pointer-events-none">
+                  $
+                </span>
+                <input
+                  type="number"
+                  name="dailyBudget"
+                  value={formData.dailyBudget}
+                  onChange={handleInputChange}
+                  placeholder="Daily Budget"
+                  className="w-full pl-8 pr-4 py-2 border rounded-lg"
+                />
+              </div>
             </div>
 
             <input

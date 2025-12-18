@@ -133,13 +133,19 @@ const CreateAdgroupTab = ({
                 />
 
                 {/* Default Bid */}
-                <input
-                  type="number"
-                  placeholder="Default Bid"
-                  className="px-4 py-2 border rounded-lg"
-                  value={g.cpcBid}
-                  onChange={e => updateAdGroup(index, "cpcBid", e.target.value)}
-                />
+                <div className="relative w-full">
+                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-500 pointer-events-none">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    placeholder="Default Bid"
+                    className="w-full pl-8 pr-4 py-2 border rounded-lg"
+                    value={g.cpcBid}
+                    onChange={e => updateAdGroup(index, "cpcBid", e.target.value)}
+                  />
+                </div>
+
               </div>
 
               {/* Keyword Groups Section */}
