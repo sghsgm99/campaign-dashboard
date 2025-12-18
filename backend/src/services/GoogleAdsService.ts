@@ -357,6 +357,8 @@ export class GoogleAdsService {
         .map((r: any) => r?.ad_group_criterion_result?.resource_name)
         .filter(Boolean);
       }
+
+      console.log("keywords", createdKeywordResources);
   
       //----------------------------------------------------
       // SUCCESS RESULT

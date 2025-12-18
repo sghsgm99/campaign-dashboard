@@ -17,16 +17,18 @@ export class AdGroupService {
   async create(payload: CreateAdGroupDTO[]) {
     const result = await this.googleAds.createAdGroups(payload);
 
+    let keywordResourceIndex = 0;
+
     for (let i = 0; i < payload.length; i++) {
       const item = payload[i];
-  
+
       const adGroupResource = result?.adGroups[i];
       const adGroupId = adGroupResource ? adGroupResource.split('/').pop() : null;
-  
+
       if (!adGroupId) {
         throw new Error("Failed to extract adGroupId from result.");
       }
-  
+
       const adGroupData = {
         googleCampaignId: item.campaignId,
         name: item.name,
@@ -36,14 +38,28 @@ export class AdGroupService {
         googleAdGroupId: adGroupId,
         keywords: item.keywords
       };
-  
+
       const adGroupIdFromDB = await AdGroupRepository.save(adGroupData);
+
+      // ✅ count how many keywords THIS ad group has
+      const keywordCount =
+        (item.keywords.broad?.length || 0) +
+        (item.keywords.phrase?.length || 0) +
+        (item.keywords.exact?.length || 0);
+
+      // ✅ slice ONLY this ad group's keyword resources
+      const keywordResourcesForAdGroup = result.keywords.slice(
+        keywordResourceIndex,
+        keywordResourceIndex + keywordCount
+      );
+
+      // ✅ advance global index
+      keywordResourceIndex += keywordCount;
 
       await KeywordRepository.save({
         adGroupId: adGroupIdFromDB,
-        broad: JSON.stringify(item.keywords.broad),
-        phrase: JSON.stringify(item.keywords.phrase),
-        exact: JSON.stringify(item.keywords.exact),
+        keywords: item.keywords,
+        googleKeywordResources: keywordResourcesForAdGroup
       });
     }
   
