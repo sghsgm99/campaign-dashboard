@@ -16,7 +16,7 @@ export function useCampaigns() {
     campaignName: "",
     campaignType: "SEARCH",
     dailyBudget: "",
-    targetLocation: "",
+    targetLocation: "all",
   });
 
   const loadCampaigns = async () => {
