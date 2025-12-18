@@ -18,6 +18,11 @@ export const api = {
     return response.data;
   },
 
+  getKeywords: async () => {
+    const response = await axios.get(`${API_BASE_URL}/keywords`);
+    return response.data;
+  },
+
   getAdGroupsByCampaign: async (campaignId: string) => {
     const response = await axios.get(`${API_BASE_URL}/adgroups/${campaignId}`);
     return response.data;

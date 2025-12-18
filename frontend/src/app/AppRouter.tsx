@@ -5,6 +5,7 @@ import OverviewPage from "./pages/OverviewPage";
 import CampaignsPage from "./pages/CampaignsPage";
 import AdgroupsPage from "./pages/AdgroupsPage";
 import AdsPage from "./pages/AdsPage";
+import KeywordsPage from "./pages/KeywordsPage";
 import CreateCampaignPage from "./pages/CreateCampaignPage";
 import CreateAdgroupPage from "./pages/CreateAdgroupPage";
 import CreateAdPage from "./pages/CreateAdPage";
@@ -20,6 +21,7 @@ export default function AppRouter() {
         <Route path="/campaigns" element={<CampaignsPage />} />
         <Route path="/adgroups" element={<AdgroupsPage />} />
         <Route path="/ads" element={<AdsPage />} />
+        <Route path="/keywords" element={<KeywordsPage />} />
 
         <Route path="/create/campaign" element={<CreateCampaignPage />} />
         <Route path="/create/adgroup" element={<CreateAdgroupPage />} />

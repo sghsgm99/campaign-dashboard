@@ -5,7 +5,8 @@ import {
   Layers,
   PlusCircle,
   Ban,
-  BarChart3
+  MonitorPlay,
+  KeyRound,
 } from "lucide-react";
 
 const navItem =
@@ -52,8 +53,15 @@ export default function Sidebar() {
           <NavLink to="/ads" className={({ isActive }) =>
             `${navItem} ${isActive ? active : inactive}`
           }>
-            <BarChart3 size={18} />
+            <MonitorPlay size={18} />
             Ads
+          </NavLink>
+
+          <NavLink to="/keywords" className={({ isActive }) =>
+            `${navItem} ${isActive ? active : inactive}`
+          }>
+            <KeyRound size={18} />
+            Keywords
           </NavLink>
         </div>
 

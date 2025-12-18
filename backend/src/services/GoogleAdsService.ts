@@ -358,8 +358,6 @@ export class GoogleAdsService {
         .filter(Boolean);
       }
 
-      console.log("keywords", createdKeywordResources);
-  
       //----------------------------------------------------
       // SUCCESS RESULT
       //----------------------------------------------------

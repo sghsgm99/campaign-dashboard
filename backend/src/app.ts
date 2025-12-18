@@ -5,6 +5,7 @@ import cors from "cors";
 import campaignRoutes from "./modules/campaign/campaign.routes";
 import adgroupRoutes from "./modules/adgroup/adgroup.routes";
 import adRoutes from "./modules/ad/ad.routes";
+import keywordRoutes from "./modules/keyword/keyword.routes";
 import negtivekeywordRoutes from "./modules/negativekeyword/negativekeyword.routes";
 
 // Initialize Express app
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use("/api/campaigns", campaignRoutes);
 app.use("/api/adgroups", adgroupRoutes);
 app.use("/api/ads", adRoutes);
+app.use("/api/keywords", keywordRoutes);
 app.use("/api/negativekeywords", negtivekeywordRoutes);
 
 // Health check route
