@@ -86,14 +86,16 @@ const CreateCampaignTab = ({
               </div>
             </div>
 
-            <input
-              type="text"
+            <select
               name="targetLocation"
               value={formData.targetLocation}
               onChange={handleInputChange}
-              placeholder="Target Location"
               className="w-full px-4 py-2 border rounded-lg"
-            />
+            >
+              <option value="all">All countries and territories</option>
+              <option value="us_ca">United States and Canada</option>
+              <option value="us">United States</option>
+            </select>
           </div>
 
           {/* Buttons */}

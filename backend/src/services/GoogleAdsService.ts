@@ -10,6 +10,15 @@ import {
 import { env } from "../config/env";
 import { googleAdsClient } from "../config/googleAdsClient";
 
+const GEO_TARGETS: Record<string, string[]> = {
+  all: ["geoTargetConstants/2840"], // All countries & territories
+  us: ["geoTargetConstants/2840"],  // United States
+  us_ca: [
+    "geoTargetConstants/2840", // United States
+    "geoTargetConstants/2124", // Canada
+  ],
+};
+
 export class GoogleAdsService {
   private customer: Customer;
 
@@ -83,11 +92,11 @@ export class GoogleAdsService {
       console.error("Google API Error:", err);
       throw new Error("Failed to fetch ad groups");
     }
-  }  
+  }
 
   // Create campaign workflow
   async createCampaign(payload: any) {
-    const { name, budget, broadKeywords = [], phraseKeywords = [], exactKeywords = [] } = payload;
+    const { name, budget, location, broadKeywords = [], phraseKeywords = [], exactKeywords = [] } = payload;
   
     const customerId = this.customer.credentials.customer_id;
   
@@ -197,15 +206,42 @@ export class GoogleAdsService {
     if (negativeOps.length > 0) {
       await this.customer.mutateResources(negativeOps);
     }
+
+    const locationOps: MutateOperation<resources.ICampaignCriterion>[] = [];
+
+    const geoTargets = GEO_TARGETS[location];
+
+    if (!geoTargets) {
+      throw new Error(`Invalid location value: ${location}`);
+    }
+
+    geoTargets.forEach((geo) => {
+      locationOps.push({
+        entity: "campaign_criterion",
+        operation: "create",
+        resource: {
+          campaign: campaignResource,
+          location: {
+            geo_target_constant: geo,
+          },
+        },
+      });
+    });
+
+    if (locationOps.length > 0) {
+      await this.customer.mutateResources(locationOps);
+    }
   
     return {
       campaign: campaignResource,
+      locationTargeting: location,
       negativeKeywordsAdded: {
         broad: broadKeywords,
         phrase: phraseKeywords,
         exact: exactKeywords,
       },
     };
+    
   }
 
   async createAdGroups(adGroups: any[]) {

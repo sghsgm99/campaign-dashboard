@@ -17,10 +17,12 @@ export interface CreateCampaignDB {
   channelType: Campaign["channelType"];
   budget: number;
   googleCampaignId?: string | null;
+  location: string;
 }
 
 export interface CreateCampaignDTO {
   name: string;
   budget: number;
   type: Campaign["channelType"];
+  location: string;
 }

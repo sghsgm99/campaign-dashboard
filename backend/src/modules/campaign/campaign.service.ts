@@ -7,7 +7,6 @@ export class CampaignService {
 
   async getAll() {
     return CampaignRepository.findAll();
-    //return this.googleAds.getCampaigns();
   }
 
   async create(payload: CreateCampaignDTO) {
@@ -34,7 +33,8 @@ export class CampaignService {
       status: "PAUSED",
       channelType: payload.type,
       budget: payload.budget,
-      googleCampaignId: campaignId
+      googleCampaignId: campaignId,
+      location: payload.location
     });
 
     return result;

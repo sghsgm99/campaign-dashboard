@@ -23,10 +23,10 @@ export class CampaignRepository {
   static async save(data: CreateCampaignDB) {
     const [result] = await db.query<ResultSetHeader>(
       `
-      INSERT INTO campaigns (name, status, channel_type, budget, google_campaign_id)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO campaigns (name, status, channel_type, budget, location, google_campaign_id)
+      VALUES (?, ?, ?, ?, ?, ?)
       `,
-      [data.name, data.status, data.channelType, data.budget, data.googleCampaignId]
+      [data.name, data.status, data.channelType, data.budget, data.location, data.googleCampaignId]
     );
 
     return result.insertId;

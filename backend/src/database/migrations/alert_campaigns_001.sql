@@ -1,0 +1,3 @@
+ALTER TABLE campaigns
+ADD COLUMN location VARCHAR(20) NOT NULL DEFAULT 'all'
+AFTER budget;
