@@ -11,7 +11,7 @@ export class AdGroupController {
       res.json(adgroups);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Failed to fetch campaigns" });
+      res.status(500).json({ error: "Failed to fetch adgroups" });
     }
   };
 

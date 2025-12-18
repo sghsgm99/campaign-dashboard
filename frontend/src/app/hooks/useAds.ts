@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../services/api";
 
 type CreationStatus = {
@@ -7,10 +7,24 @@ type CreationStatus = {
 };
 
 export function useAds() {
+  const [ads, setAds] = useState<any[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [creationStatus, setCreationStatus] =
     useState<CreationStatus | null>(null);
 
+  const loadAds = async () => {
+    try {
+      const data = await api.getAds();
+      setAds(data);
+    } catch (err) {
+      console.error("Failed to load ads:", err);
+    }
+  };
+
+  useEffect(() => {
+    loadAds();
+  }, []);
+  
   const createAds = async (payload: any[]) => {
     setIsCreating(true);
     setCreationStatus(null);
@@ -32,8 +46,11 @@ export function useAds() {
   };
 
   return {
+    ads,
     isCreating,
     creationStatus,
+
+    loadAds,
     createAds,
   };
 }

@@ -2,6 +2,8 @@ import { RowDataPacket } from "mysql2";
 
 export interface Ad extends RowDataPacket {
   id: number;
+  campaignName: string;
+  adgroupName: string;
   adGroupId: number;
   headlines: string[];
   descriptions: string[];

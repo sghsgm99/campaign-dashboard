@@ -5,6 +5,7 @@ import {
   Layers,
   PlusCircle,
   Ban,
+  BarChart3
 } from "lucide-react";
 
 const navItem =
@@ -46,6 +47,13 @@ export default function Sidebar() {
           }>
             <Layers size={18} />
             Ad Groups
+          </NavLink>
+
+          <NavLink to="/ads" className={({ isActive }) =>
+            `${navItem} ${isActive ? active : inactive}`
+          }>
+            <BarChart3 size={18} />
+            Ads
           </NavLink>
         </div>
 

@@ -5,6 +5,10 @@ import { CreateAdDTO } from "./ad.types";
 export class AdService {
   private googleAds = new GoogleAdsService();
 
+  async getAll() {
+    return AdRepository.getAll();
+  }
+
   async create(payload: CreateAdDTO[]) {
     const result = await this.googleAds.createAds(payload);
 

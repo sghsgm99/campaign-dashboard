@@ -7,5 +7,6 @@ const service = new AdService();
 const controller = new AdController(service);
 
 router.post("/", controller.create);
+router.get("/", controller.getAll);
 
 export default router;

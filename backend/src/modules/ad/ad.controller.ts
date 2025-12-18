@@ -5,6 +5,16 @@ import { CreateAdRequest } from "./ad.types";
 export class AdController {
   constructor(private readonly service: AdService) {}
 
+  getAll = async (_req: Request, res: Response) => {
+    try {
+      const ads = await this.service.getAll();
+      res.json(ads);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to fetch ads" });
+    }
+  };
+
   create = async (req: Request, res: Response) => {
     try {
       const { ads } = req.body as CreateAdRequest;
