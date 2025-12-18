@@ -16,7 +16,7 @@ export class AdService {
       const item = payload[i];
   
       const adResource = result?.ads[i];
-      const adId = adResource ? adResource.split('/').pop() : null;
+      const adId = adResource ? adResource.split('~').pop() : null;
   
       if (!adId) {
         throw new Error("Failed to extract adId from result.");

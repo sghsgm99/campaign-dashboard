@@ -408,7 +408,7 @@ export class GoogleAdsService {
   
       return {
         message: "Ads created successfully",
-        ads: createdAdResources,
+        ads: createdAdResources, //customers/6132954200/adGroupAds/193436236274~788972330525
       };
     } catch (err: any) {
       console.error("Bulk A Creation Error:", err);
