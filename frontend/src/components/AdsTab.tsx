@@ -32,7 +32,7 @@ const AdsTab = ({ ads }: AdsTabProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">All Ad groups</h2>
+        <h2 className="text-xl font-semibold text-gray-900">All Ads</h2>
 
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -67,14 +67,9 @@ const AdsTab = ({ ads }: AdsTabProps) => {
                 <td className="px-6 py-4 max-w-md">
                   <div className="space-y-1">
                     {/* Headlines */}
-                    <a
-                      href={ad.finalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-700 font-medium hover:underline line-clamp-2"
-                    >
+                    <div className="text-blue-700 font-medium line-clamp-2">
                       {truncate(ad.headlines?.join(' | ') ?? '', 20)}
-                    </a>
+                    </div>
 
                     {/* Display URL */}
                     <div className="text-xs text-green-700 truncate">
