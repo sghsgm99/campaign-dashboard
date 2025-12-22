@@ -10,6 +10,7 @@ import CreateCampaignPage from "./pages/CreateCampaignPage";
 import CreateAdgroupPage from "./pages/CreateAdgroupPage";
 import CreateAdPage from "./pages/CreateAdPage";
 import CreateNegativeKeywordPage from "./pages/CreateNegativeKeywordPage";
+import CreatePerformanceMaxCampaignPage from "./pages/CreatePerformanceMaxCampaignPage";
 
 export default function AppRouter() {
   return (
@@ -27,6 +28,8 @@ export default function AppRouter() {
         <Route path="/create/adgroup" element={<CreateAdgroupPage />} />
         <Route path="/create/ad" element={<CreateAdPage />} />
         <Route path="/create/negative-keyword" element={<CreateNegativeKeywordPage />} />
+
+        <Route path="/create/pmax" element={<CreatePerformanceMaxCampaignPage />} />
       </Route>
     </Routes>
   );

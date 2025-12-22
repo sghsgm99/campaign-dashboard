@@ -97,6 +97,17 @@ export default function Sidebar() {
             <Ban size={18} />
             Negative Keywords
           </NavLink>
+
+          <NavLink
+            to="/create/pmax"
+            className={({ isActive }) =>
+              `${navItem} ${isActive ? active : inactive}`
+            }
+          >
+            <PlusCircle size={18} />
+            Performance Max
+          </NavLink>
+
         </div>
       </nav>
     </aside>
