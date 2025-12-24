@@ -513,48 +513,6 @@ export class GoogleAdsService {
     };
   }
 
-  private async createImageAsset(
-    customerId: string,
-    buffer: Buffer,
-    name: string
-  ) {
-    const result = await this.customer.mutateResources([
-      {
-        entity: "asset",
-        operation: "create",
-        resource: {
-          name,
-          type: enums.AssetType.IMAGE,
-          image_asset: {
-            data: buffer,
-          },
-        },
-      },
-    ]);
-  
-    return result.mutate_operation_responses?.[0]?.asset_result?.resource_name;
-  }
-  
-
-  private async createTextAsset(
-    text: string,
-    type: enums.AssetFieldType
-  ) {
-    const result = await this.customer.mutateResources([
-      {
-        entity: "asset",
-        operation: "create",
-        resource: {
-          type,
-          text_asset: { text },
-        },
-      },
-    ]);
-  
-    return result.mutate_operation_responses?.[0]?.asset_result?.resource_name;
-  }
-  
-
   async createPerformanceMaxCampaign(payload: any) {
     const customerId = this.customer.credentials.customer_id;
   
@@ -606,7 +564,7 @@ export class GoogleAdsService {
           resource_name: logoAssetTemp,
           name: "Square Logo Asset",             // ✅ REQUIRED
           image_asset: {
-            data: images.square.toString("base64"),
+            data: images.logo.toString("base64"),
           },
         },
       },
@@ -672,7 +630,5 @@ export class GoogleAdsService {
       campaign: campaignResource,
     };
   }
-  
-  
   
 }
