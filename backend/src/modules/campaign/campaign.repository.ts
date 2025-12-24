@@ -1,5 +1,5 @@
 import { db } from "../../config/database";
-import { Campaign, CreateCampaignDB } from "./campaign.types";
+import { Campaign, CreateCampaignDB, CreatePMaxCampaignDB } from "./campaign.types";
 import { ResultSetHeader } from "mysql2";
 
 export class CampaignRepository {
@@ -31,4 +31,25 @@ export class CampaignRepository {
 
     return result.insertId;
   }
+
+  static async savePMax(data: CreatePMaxCampaignDB) {
+    const [result] = await db.query<ResultSetHeader>(
+      `
+      INSERT INTO campaigns
+        (name, status, channel_type, budget, location, google_campaign_id)
+      VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      [
+        data.name,
+        data.status,
+        data.channelType,
+        data.budget,
+        data.location,
+        data.googleCampaignId
+      ]
+    );
+  
+    return result.insertId;
+  }  
+  
 }

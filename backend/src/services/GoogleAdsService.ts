@@ -558,155 +558,121 @@ export class GoogleAdsService {
   async createPerformanceMaxCampaign(payload: any) {
     const customerId = this.customer.credentials.customer_id;
   
-    const {
-      name,
-      budget,
-      finalUrl,
-      headlines,
-      descriptions,
-      images,
-    } = payload;
+    const { name, budget, images } = payload;
   
-    /* -------------------------
-     * 1. Budget + Campaign
-     * ------------------------- */
-    const budgetResource = ResourceNames.campaignBudget(customerId, "-1");
+    // ---- TEMP RESOURCE NAMES ----
+    const budgetTemp = ResourceNames.campaignBudget(customerId, "-1");
+    const campaignTemp = ResourceNames.campaign(customerId, "-2");
+    const businessNameAssetTemp = ResourceNames.asset(customerId, "-3");
+    const logoAssetTemp = ResourceNames.asset(customerId, "-4");
   
-    const campaignResult = await this.customer.mutateResources([
+    const operations: MutateOperation<any>[] = [
+      /* --------------------------------
+       * Campaign Budget
+       * -------------------------------- */
       {
         entity: "campaign_budget",
         operation: "create",
         resource: {
-          resource_name: budgetResource,
+          resource_name: budgetTemp,
+          name: "PMax Budget",
           amount_micros: toMicros(budget),
           explicitly_shared: false,
         },
       },
+  
+      /* --------------------------------
+       * Business Name Asset (REQUIRED)
+       * -------------------------------- */
+      {
+        entity: "asset",
+        operation: "create",
+        resource: {
+          resource_name: businessNameAssetTemp,
+          name: "Business Name Asset",          // ✅ REQUIRED
+          text_asset: {
+            text: name,
+          },
+        },
+      },
+  
+      /* --------------------------------
+       * Square Logo Asset (REQUIRED)
+       * -------------------------------- */
+      {
+        entity: "asset",
+        operation: "create",
+        resource: {
+          resource_name: logoAssetTemp,
+          name: "Square Logo Asset",             // ✅ REQUIRED
+          image_asset: {
+            data: images.square.toString("base64"),
+          },
+        },
+      },
+  
+      /* --------------------------------
+       * Campaign
+       * -------------------------------- */
       {
         entity: "campaign",
         operation: "create",
         resource: {
+          resource_name: campaignTemp,
           name,
           advertising_channel_type:
             enums.AdvertisingChannelType.PERFORMANCE_MAX,
           status: enums.CampaignStatus.PAUSED,
-          campaign_budget: budgetResource,
+          campaign_budget: budgetTemp,
           maximize_conversions: {},
           contains_eu_political_advertising:
             enums.EuPoliticalAdvertisingStatus.DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING,
         },
-      }
-    ]);
+      },
+  
+      /* --------------------------------
+       * CampaignAsset: Business Name
+       * -------------------------------- */
+      {
+        entity: "campaign_asset",
+        operation: "create",
+        resource: {
+          campaign: campaignTemp,
+          asset: businessNameAssetTemp,
+          field_type: enums.AssetFieldType.BUSINESS_NAME,
+        },
+      },
+  
+      /* --------------------------------
+       * CampaignAsset: Logo (square image)
+       * -------------------------------- */
+      {
+        entity: "campaign_asset",
+        operation: "create",
+        resource: {
+          campaign: campaignTemp,
+          asset: logoAssetTemp,
+          field_type: enums.AssetFieldType.LOGO, // ✅ MUST be LOGO
+        },
+      },
+    ];
+  
+    const result = await this.customer.mutateResources(operations);
   
     const campaignResource =
-      campaignResult.mutate_operation_responses?.[1]?.campaign_result
-        ?.resource_name;
+      result.mutate_operation_responses
+        ?.find((r: any) => r.campaign_result)
+        ?.campaign_result?.resource_name;
   
     if (!campaignResource) {
       throw new Error("Failed to create Performance Max campaign");
     }
   
-    /* -------------------------
-     * 2. REQUIRED Brand Assets
-     * ------------------------- */
-  
-    // BUSINESS NAME (REQUIRED)
-    const businessNameAsset = await this.createTextAsset(
-      name,
-      enums.AssetFieldType.BUSINESS_NAME
-    );
-  
-    // SQUARE LOGO (REQUIRED)
-    if (!images?.square) {
-      throw new Error("Square logo is required for Performance Max");
-    }
-  
-    const squareLogoAsset = await this.createImageAsset(
-      customerId,
-      images.square,
-      `${name} Square Logo`
-    );
-  
-    /* -------------------------
-     * 3. Link assets to campaign
-     * ------------------------- */
-    const campaignAssetOps: MutateOperation<any>[] = [
-      {
-        entity: "campaign_asset",
-        operation: "create",
-        resource: {
-          campaign: campaignResource,
-          asset: businessNameAsset,
-          field_type: enums.AssetFieldType.BUSINESS_NAME,
-        },
-      },
-      {
-        entity: "campaign_asset",
-        operation: "create",
-        resource: {
-          campaign: campaignResource,
-          asset: squareLogoAsset,
-          field_type: enums.AssetFieldType.LOGO,
-        },
-      },
-    ];
-  
-    await this.customer.mutateResources(campaignAssetOps);
-  
-    /* -------------------------
-     * 4. Optional: Headlines
-     * ------------------------- */
-    for (const text of headlines || []) {
-      const asset = await this.createTextAsset(
-        text,
-        enums.AssetFieldType.HEADLINE
-      );
-  
-      await this.customer.mutateResources([
-        {
-          entity: "campaign_asset",
-          operation: "create",
-          resource: {
-            campaign: campaignResource,
-            asset,
-            field_type: enums.AssetFieldType.HEADLINE,
-          },
-        },
-      ]);
-    }
-  
-    /* -------------------------
-     * 5. Optional: Descriptions
-     * ------------------------- */
-    for (const text of descriptions || []) {
-      const asset = await this.createTextAsset(
-        text,
-        enums.AssetFieldType.DESCRIPTION
-      );
-  
-      await this.customer.mutateResources([
-        {
-          entity: "campaign_asset",
-          operation: "create",
-          resource: {
-            campaign: campaignResource,
-            asset,
-            field_type: enums.AssetFieldType.DESCRIPTION,
-          },
-        },
-      ]);
-    }
-  
-    /* -------------------------
-     * DONE
-     * ------------------------- */
     return {
       campaign: campaignResource,
-      assets: {
-        businessName: businessNameAsset,
-        squareLogo: squareLogoAsset,
-      },
     };
   }
+  
+  
   
 }

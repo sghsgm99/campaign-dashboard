@@ -26,3 +26,25 @@ export interface CreateCampaignDTO {
   type: Campaign["channelType"];
   location: string;
 }
+
+export interface CreatePMaxCampaignDTO extends CreateCampaignDTO {
+  headlines: string[];
+  descriptions: string[];
+  finalUrl: string;
+  images?: {
+    square?: Buffer | null;
+    landscape?: Buffer | null;
+    logo?: Buffer | null;
+  };
+}
+
+export interface CreatePMaxCampaignDB extends CreateCampaignDB {
+  finalUrl: string;
+  headlines: string;
+  descriptions: string;
+  images?: {
+    square?: string | null;
+    landscape?: string | null;
+    logo?: string | null;
+  };
+}
