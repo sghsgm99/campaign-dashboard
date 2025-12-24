@@ -22,12 +22,16 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      const result = await controller.createPMax(req, res);
-      res.status(201).json({ message: "PMax campaign created", data: result });
+      const result = await controller.createPMax(req);
+      res.status(201).json({
+        message: "PMax campaign created",
+        data: result,
+      });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   }
 );
+
 
 export default router;

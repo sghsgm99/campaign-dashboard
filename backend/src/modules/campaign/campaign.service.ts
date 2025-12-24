@@ -90,6 +90,8 @@ export class CampaignService {
       logo: payload.images.logo ? await this.saveImage(payload.images.logo, "logo") : null,
     };
 
+    console.log('imagesUrls:', imagesUrls);
+
     // Call Google Ads API
     const result = await this.googleAds.createPerformanceMaxCampaign(payload);
 
