@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
+import { readFile } from "fs/promises";
 import { GoogleAdsService } from "../../services/GoogleAdsService";
 import { CampaignRepository } from "./campaign.repository";
 import { CreateCampaignDTO, CreatePMaxCampaignDTO, CreatePMaxCampaignDB } from "./campaign.types";
@@ -13,6 +14,16 @@ export class CampaignService {
   constructor() {
     if (!fs.existsSync(this.uploadDir)) fs.mkdirSync(this.uploadDir, { recursive: true });
   }
+  
+  private async pathToBase64(publicPath: string): Promise<string> {
+    const filePath = path.join(
+      this.uploadDir,
+      publicPath.replace("/uploads/", "")
+    );
+  
+    const buffer = await readFile(filePath);
+    return buffer.toString("base64");
+  }  
 
   private async saveImage(file: Buffer, type: "square" | "landscape" | "logo") {
     if (!file) return null;
@@ -22,16 +33,16 @@ export class CampaignService {
     // Set required dimensions
     switch (type) {
       case "square":
-        width = 1200;
-        height = 1200;
+        width = 300; //1200
+        height = 300; //1200
         break;
       case "landscape":
-        width = 1200;
-        height = 628;
+        width = 600; //1200;
+        height = 314; //628;
         break;
       case "logo":
-        width = 1200;
-        height = 300;
+        width = 128; //1200;
+        height = 128; //1200;
         break;
       default:
         throw new Error("Invalid image type");
@@ -80,27 +91,49 @@ export class CampaignService {
 
   async createPMaxCampaign(payload: CreatePMaxCampaignDTO) {
     if (!payload.images?.square) {
-      throw new Error("Square logo is required for Performance Max campaigns with Brand Guidelines.");
+      throw new Error(
+        "Square logo is required for Performance Max campaigns with Brand Guidelines."
+      );
     }
-
+  
     // Save images
     const imagesUrls: CreatePMaxCampaignDB["images"] = {
       square: await this.saveImage(payload.images.square, "square"),
-      landscape: payload.images.landscape ? await this.saveImage(payload.images.landscape, "landscape") : null,
-      logo: payload.images.logo ? await this.saveImage(payload.images.logo, "logo") : null,
+      landscape: payload.images.landscape
+        ? await this.saveImage(payload.images.landscape, "landscape")
+        : null,
+      logo: payload.images.logo
+        ? await this.saveImage(payload.images.logo, "logo")
+        : null,
     };
-
-    console.log('imagesUrls:', imagesUrls);
-
-    // Call Google Ads API
-    const result = await this.googleAds.createPerformanceMaxCampaign(payload);
-
+  
+    const adsPayload = {
+      ...payload,
+      images: {
+        square: imagesUrls.square
+          ? await this.pathToBase64(imagesUrls.square)
+          : null,
+        landscape: imagesUrls.landscape
+          ? await this.pathToBase64(imagesUrls.landscape)
+          : null,
+        logo: imagesUrls.logo
+          ? await this.pathToBase64(imagesUrls.logo)
+          : null,
+      },
+    };
+  
+    const result = await this.googleAds.createPerformanceMaxCampaign(adsPayload);
+  
     const campaignResource = result?.campaign;
-    if (!campaignResource) throw new Error("No campaign resource returned from Google Ads API.");
-
+    if (!campaignResource) {
+      throw new Error("No campaign resource returned from Google Ads API.");
+    }
+  
     const campaignId = campaignResource.split("/").pop();
-    if (!campaignId) throw new Error("Failed to extract campaign ID.");
-
+    if (!campaignId) {
+      throw new Error("Failed to extract campaign ID.");
+    }
+  
     // Save to DB
     const dbPayload: CreatePMaxCampaignDB = {
       name: payload.name,
@@ -114,10 +147,10 @@ export class CampaignService {
       descriptions: JSON.stringify(payload.descriptions),
       images: imagesUrls,
     };
-
+  
     await CampaignRepository.savePMax(dbPayload);
-
+  
     return result;
   }
-
+  
 }
