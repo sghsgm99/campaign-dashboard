@@ -6,6 +6,7 @@ interface Campaign {
   name: string;
   status: string;
   budget: number;
+  channelType: string;
   impressions?: number;
   clicks?: number;
   ctr?: number;
@@ -71,6 +72,7 @@ const CampaignsTab = ({ campaigns }: CampaignsTabProps) => {
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Campaign</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-600">Status</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-600">Budget</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-600">Impressions</th>
@@ -84,6 +86,7 @@ const CampaignsTab = ({ campaigns }: CampaignsTabProps) => {
             {paginatedCampaigns.map((campaign) => (
               <tr key={campaign.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 font-medium text-gray-900">{campaign.name}</td>
+                <td className="px-6 py-4 font-medium text-gray-900">{campaign.channelType}</td>
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
