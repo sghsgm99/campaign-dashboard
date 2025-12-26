@@ -57,4 +57,9 @@ export const api = {
     const response = await axios.post(`${API_BASE_URL}/negativekeywords`, negativeKeywordData);
     return response.data;
   },
+
+  createPerformanceMaxCampaign: async (campaignData: any) => {
+    const response = await axios.post(`${API_BASE_URL}/campaigns/pmax`, campaignData);
+    return response.data;
+  },
 };
